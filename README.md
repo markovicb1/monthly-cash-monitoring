@@ -50,7 +50,7 @@ In order to prepare app for personal use or further development, follow this ste
   - Now you have access to the default Database `postgres`.
 4. Create Database `app_db` with this SQL command (paste in shell):
 ```sql
-CREATE DATABASE app_dbtest
+CREATE DATABASE app_db
 WITH OWNER = postgres
 ENCODING = 'UTF8'
 TABLESPACE = pg_default
@@ -123,6 +123,35 @@ TABLESPACE pg_default;
 ALTER TABLE IF EXISTS public."Transactions"
 OWNER to postgres;
 ```
+10. Insert demo data in 'User' table:
+```sql
+INSERT INTO "User" (name)
+VALUES ('Admin');
+```
+11. Finally, the DB is ready to use
+
+### Adding important Libraries
+
+Unfortunately, PostgreSQL doesn't have built-in/default DriverManager for Java lang so it's necessary to download it separately from [here](https://jdbc.postgresql.org/download/)[^3].
+
+Additionally, you can download Third party LookAndFeel to make Java Swing more eye catching. I recommend using [FlatLaf](https://www.formdev.com/flatlaf/)
+
+Downloaded files are Executable JARs, which should be added in Projects directory. After adding them, they should also be added as libraries in project.
+
+If you are not fammiliar with adding JARs as external libraries in Java projects, I recommend reading these articles:
+- IntelliJ IDEA: [GeeksForGeeks](https://www.geeksforgeeks.org/how-to-add-external-jar-file-to-an-intellij-idea-project/)
+- Eclipse Java IDE: [WikiHow](https://www.wikihow.com/Add-JARs-to-Project-Build-Paths-in-Eclipse-(Java))
+
+## Photos (SRB edition)
+
+# Future changes
+
+Here's the list of upcoming changes:
+- English interface
+- Edit Activities directly through the app
+- Make history graph
+- PDF view of history with additional statistics
 
 [^1]: Version 1.0 is in Serbian Cyrilic only.
 [^2]: Even though the newest version of Java is 19, it is recommended to use the LTS(Long time support) version, which is version 17
+[^3]: PostgreSQL JDBC Driver, commonly called pgJDBC is an open souce JDBC driver/API for Java. More about this project can be found [here](https://jdbc.postgresql.org/documentation/)
