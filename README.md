@@ -142,7 +142,8 @@ If you are not fammiliar with adding JARs as external libraries in Java projects
 - IntelliJ IDEA: [GeeksForGeeks](https://www.geeksforgeeks.org/how-to-add-external-jar-file-to-an-intellij-idea-project/)
 - Eclipse Java IDE: [WikiHow](https://www.wikihow.com/Add-JARs-to-Project-Build-Paths-in-Eclipse-(Java))
 
-## Photos (SRB edition)
+## Photo (SRB edition)
+![CASHGUI](https://user-images.githubusercontent.com/115867204/199236213-53f256af-265a-4058-b555-4260dfa24967.jpg)
 
 # Future changes
 
