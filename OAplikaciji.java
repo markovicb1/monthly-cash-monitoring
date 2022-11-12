@@ -54,7 +54,7 @@ public class OAplikaciji extends JFrame {
 
         JLabel datum = new JLabel("Производња           11.2022.");
         datum.setFont(new Font("Times New Roman",Font.ITALIC,13));
-        datum.setBounds(WINDOW_WIDTH / 3 + 5,110,150,20);
+        datum.setBounds(WINDOW_WIDTH / 3 + 5,110,180,20);
 
         JLabel autor = new JLabel("Направио и развио \u00a9 Богдан Circled B");
         autor.setFont(new Font("Times New Roman",Font.BOLD,13));
