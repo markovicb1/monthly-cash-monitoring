@@ -149,9 +149,10 @@ If you are not fammiliar with adding JARs as external libraries in Java projects
 
 Here's the list of upcoming changes:
 - English interface
-- Edit Activities directly through the app
+- Edit Activities directly through the app / ADDED
 - Make history graph
 - PDF view of history with additional statistics
+- About app page / ADDED
 
 [^1]: Version 1.0 is in Serbian Cyrilic only.
 [^2]: Even though the newest version of Java is 19, it is recommended to use the LTS(Long time support) version, which is version 17
