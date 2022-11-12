@@ -11,6 +11,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.*;
 import java.time.LocalDate;
@@ -24,6 +27,10 @@ public class KorisnickoOkruzenje extends JFrame {
     public static final String RASHOD_FLAG = "Rashod card";
     public static final String AKTIVNOST_FLAG = "Aktivnost card";
     public static final String ISTORIJA_FLAG = "Istorija card";
+    public static final String IZMENI_FLAG = "Izmeni aktivnost card";
+    public static final String GENERISI_FLAG = "Generisi godisnji izvestaj card";
+    public static final String HELP_FLAG = "Help card";
+    public static final String ABOUT_FLAG = "O aplikaciji card";
     private static final int userID = 1;
     private static final String dbURL = "jdbc:postgresql://localhost:5432/app_db";
     private static final String dbUsername = "postgres";
@@ -35,6 +42,10 @@ public class KorisnickoOkruzenje extends JFrame {
     private JPanel rashod;
     private JPanel aktivnost;
     private JPanel istorija;
+    private JPanel izmeniAktivnostCard;
+    private JPanel generisiGodisnjiCard;
+    private JPanel helpCard;
+    private JPanel oAplikacijiCard;
     private JButton noviPrihod;
     private JButton noviRashod;
     private JButton dodajAktivnost;
@@ -85,6 +96,19 @@ public class KorisnickoOkruzenje extends JFrame {
     private JButton istorijaObrisi;
     private DefaultTableModel defaultTableModel;
 
+    private JMenuBar menuBar;
+    private JMenu podaci;
+    private JMenu pomoc;
+    private JMenuItem izmeniAktivnost;
+    private JMenuItem generisiPDF;
+    private JMenuItem kakoKoristiti;
+    private JMenuItem oAplikaciji;
+    private JLabel izmeniАktivnostNaslov;
+    private JLabel izmeniAktivnostNovoIme;
+    private JTextField izmeniAktivnostNovoImeTf;
+    private JComboBox izmeniAktivnostCB;
+    private JLabel izmeniAktivnostIzaberi;
+    private JButton izmeniAktivnostBtn;
     private void showSidePanel() {
         side = new JPanel(null);
         side.setBounds(0, 0, WINDOW_WIDTH / 4, WINDOW_HEIGHT);
@@ -94,6 +118,99 @@ public class KorisnickoOkruzenje extends JFrame {
         labelMenu.setFont(new Font("Times New Roman", Font.BOLD, 15));
         labelMenu.setForeground(new Color(199, 211, 212));
         add(side);
+    }
+
+    private String[] updatePrihodCB(){
+        String[] data = {};
+        try {
+            Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
+            System.out.println("Connected to database.");
+            String sql = "SELECT COUNT(name) FROM \"Activities\" WHERE type = '+';";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                data = new String[resultSet.getInt(1)];
+            }
+            resultSet.close();
+            statement.close();
+            sql = "SELECT name FROM \"Activities\" WHERE type = '+' ORDER BY id;";
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            int i = 0;
+            while (resultSet.next()) {
+                data[i++] = resultSet.getString(1);
+            }
+            resultSet.close();
+            statement.close();
+            connection.close();
+            return data;
+
+        } catch (SQLException e) {
+            System.out.println("FATAL Error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private String[] updateRashodCB(){
+        String[] data = {};
+        try {
+            Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
+            System.out.println("Connected to database.");
+            String sql = "SELECT COUNT(name) FROM \"Activities\" WHERE type = '-';";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                data = new String[resultSet.getInt(1)];
+            }
+            resultSet.close();
+            statement.close();
+            sql = "SELECT name FROM \"Activities\" WHERE type = '-' ORDER BY id;";
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            int i = 0;
+            while (resultSet.next()) {
+                data[i++] = resultSet.getString(1);
+            }
+            resultSet.close();
+            statement.close();
+            connection.close();
+            return data;
+
+        } catch (SQLException e) {
+            System.out.println("FATAL Error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private String[] updateIzmeniAktivnost(){
+        String[] data = {};
+        try {
+            Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
+            System.out.println("Connected to database.");
+            String sql = "SELECT COUNT(name) FROM \"Activities\";";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                data = new String[resultSet.getInt(1)];
+            }
+            resultSet.close();
+            statement.close();
+            sql = "SELECT name FROM \"Activities\" ORDER BY id;";
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            int i = 0;
+            while (resultSet.next()) {
+                data[i++] = resultSet.getString(1);
+            }
+            resultSet.close();
+            statement.close();
+            connection.close();
+            return data;
+
+        } catch (SQLException e) {
+            System.out.println("FATAL Error: " + e.getMessage());
+            return null;
+        }
     }
 
     private void populatePrihodPanel() {
@@ -120,7 +237,7 @@ public class KorisnickoOkruzenje extends JFrame {
             }
             resultSet.close();
             statement.close();
-            sql = "SELECT name FROM \"Activities\" WHERE type = '+';";
+            sql = "SELECT name FROM \"Activities\" WHERE type = '+' ORDER BY id;";
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             int i = 0;
@@ -209,6 +326,10 @@ public class KorisnickoOkruzenje extends JFrame {
                     prihodMesec.setText("");
                     prihodDan.setText("");
                     prihodKolicinaNovcaTf.setText("");
+                    izmeniAktivnostCB.removeAllItems();
+                    String[] newIzmeniData = updateIzmeniAktivnost();
+                    for(String s : newIzmeniData)
+                        izmeniAktivnostCB.addItem(s);
                 } catch (SQLException e) {
                     JOptionPane.showMessageDialog(null, e.getMessage());
                 }
@@ -343,6 +464,10 @@ public class KorisnickoOkruzenje extends JFrame {
                     rashodMesec.setText("");
                     rashodDan.setText("");
                     rashodKolicinaNovcaTf.setText("");
+                    izmeniAktivnostCB.removeAllItems();
+                    String[] newIzmeniData = updateRashodCB();
+                    for(String s: newIzmeniData)
+                        izmeniAktivnostCB.addItem(s);
                 } catch (SQLException e) {
                     JOptionPane.showMessageDialog(null, e.getMessage());
                 }
@@ -414,6 +539,10 @@ public class KorisnickoOkruzenje extends JFrame {
                 }
                 connection.close();
                 //JOptionPane.showMessageDialog(null, "Podaci uneseni");
+                String[] newIzmeniData = updateIzmeniAktivnost();
+                izmeniAktivnostCB.removeAllItems();
+                for(String s:newIzmeniData)
+                    izmeniAktivnostCB.addItem(s);
                 aktivnostImeTf.setText("");
             } catch (GreskaPraznaPolja e) {
                 JOptionPane.showMessageDialog(null, "Унети сва поља!");
@@ -564,6 +693,111 @@ public class KorisnickoOkruzenje extends JFrame {
         istorija.add(istorijaObrisi);
     }
 
+    public void populateIzmeniAktivnostPanel(){
+        izmeniAktivnostCard = new JPanel(null);
+        izmeniAktivnostCard.setBackground(new Color(199, 211, 212));
+
+        izmeniАktivnostNaslov = new JLabel("Измени активност");
+        izmeniАktivnostNaslov.setFont(new Font("Times New Roman", Font.BOLD, 16));
+        izmeniАktivnostNaslov.setBounds(5 * WINDOW_WIDTH / 8 - 60, 10, 150, 20);
+
+        izmeniAktivnostIzaberi = new JLabel("Изабери активност");
+        izmeniAktivnostIzaberi.setFont(new Font("Times New Roman", Font.BOLD, 14));
+        izmeniAktivnostIzaberi.setBounds(WINDOW_WIDTH / 4 + 15, 110, 150, 20);
+
+        String[] data = {};
+        try {
+            Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
+            System.out.println("Connected to database.");
+            String sql = "SELECT COUNT(name) FROM \"Activities\";";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                data = new String[resultSet.getInt(1)];
+            }
+            resultSet.close();
+            statement.close();
+            sql = "SELECT name FROM \"Activities\" ORDER BY id;";
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            int i = 0;
+            while (resultSet.next()) {
+                data[i++] = resultSet.getString(1);
+            }
+            resultSet.close();
+            statement.close();
+            connection.close();
+
+        } catch (SQLException e) {
+            System.out.println("FATAL Error: " + e.getMessage());
+            dispose();
+        }
+        izmeniAktivnostCB = new JComboBox(data);
+        izmeniAktivnostCB.setEditable(false);
+        izmeniAktivnostCB.setFont(new Font("Times New Roman", Font.ITALIC, 13));
+        izmeniAktivnostCB.setBounds(WINDOW_WIDTH / 4 + 15 + 160, 110, 110, 20);
+
+        izmeniAktivnostNovoIme = new JLabel("Ново име активности");
+        izmeniAktivnostNovoIme.setFont(new Font("Times New Roman", Font.BOLD, 14));
+        izmeniAktivnostNovoIme.setBounds(WINDOW_WIDTH / 4 + 15, 150, 150, 20);
+
+        izmeniAktivnostNovoImeTf = new JTextField();
+        izmeniAktivnostNovoImeTf.setBounds(WINDOW_WIDTH / 4 + 15 + 160, 150, 110, 20);
+        izmeniAktivnostNovoImeTf.setHorizontalAlignment(0);
+
+        izmeniAktivnostBtn = new JButton("Ажурирај");
+        izmeniAktivnostBtn.setBounds(WINDOW_WIDTH / 4 + 15, WINDOW_HEIGHT - 80, 120, 20);
+        String[] finalData = data;
+        izmeniAktivnostBtn.addActionListener(al->{
+            try {
+                Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
+                System.out.println("Connected to database.");
+                String item = izmeniAktivnostCB.getSelectedItem().toString();
+                String sql = "SELECT id FROM \"Activities\" WHERE name = '" + item + "'";
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql);
+                int id = -1;
+                while (resultSet.next()) {
+                    id = resultSet.getInt(1);
+                }
+                resultSet.close();
+                statement.close();
+
+                sql = "UPDATE \"Activities\" " +
+                        "SET name = '" + izmeniAktivnostNovoImeTf.getText() + "' " +
+                        "WHERE id = " + id + ";";
+                statement = connection.createStatement();
+                statement.executeUpdate(sql);
+                System.out.println("Updated DB");
+                connection.close();
+                int ind = izmeniAktivnostCB.getSelectedIndex();
+                finalData[ind] = izmeniAktivnostNovoImeTf.getText();
+                izmeniAktivnostCB.removeAllItems();
+                for(String s:finalData)
+                    izmeniAktivnostCB.addItem(s);
+                izmeniAktivnostNovoImeTf.setText("");
+                defaultTableModel.setRowCount(0);
+                String[] newPrihodData = updatePrihodCB();
+                String[] newRashodData = updateRashodCB();
+                prihodCB.removeAllItems();
+                for(String s:newPrihodData)
+                    prihodCB.addItem(s);
+                rashodCB.removeAllItems();
+                for(String s:newRashodData)
+                    rashodCB.addItem(s);
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
+        });
+
+        izmeniAktivnostCard.add(izmeniАktivnostNaslov);
+        izmeniAktivnostCard.add(izmeniAktivnostIzaberi);
+        izmeniAktivnostCard.add(izmeniAktivnostCB);
+        izmeniAktivnostCard.add(izmeniAktivnostNovoIme);
+        izmeniAktivnostCard.add(izmeniAktivnostNovoImeTf);
+        izmeniAktivnostCard.add(izmeniAktivnostBtn);
+    }
+
     public KorisnickoOkruzenje() {
         super("Нотес потрошње");
         //default settings for gui
@@ -585,11 +819,14 @@ public class KorisnickoOkruzenje extends JFrame {
         populateAktivnostPanel();
         //configuring istorija card
         populateIstorijaPanel();
+        //configuring izmeniAktivnost card
+        populateIzmeniAktivnostPanel();
 
         container.add(prihod, PRIHOD_FLAG);
         container.add(rashod, RASHOD_FLAG);
         container.add(aktivnost, AKTIVNOST_FLAG);
         container.add(istorija, ISTORIJA_FLAG);
+        container.add(izmeniAktivnostCard,IZMENI_FLAG);
 
         //configuring side panel
         side = new JPanel(null);
@@ -634,8 +871,45 @@ public class KorisnickoOkruzenje extends JFrame {
         side.add(dodajAktivnost);
         side.add(vidiIstoriju);
 
+        menuBar = new JMenuBar();
+        podaci = new JMenu("Подаци");
+        podaci.setMnemonic(KeyEvent.VK_P);
+        izmeniAktivnost = new JMenuItem("Измени постојећу активност");
+        izmeniAktivnost.addActionListener(al->{
+            cardLayout.show(container, IZMENI_FLAG);
+            showSidePanel();
+        });
+        generisiPDF = new JMenuItem("Генериши годишњи ПДФ");
+        generisiPDF.addActionListener(al->{
+            System.out.println("APACHE PDFBOX");
+        });
+        podaci.add(izmeniAktivnost);
+        podaci.add(generisiPDF);
+        pomoc = new JMenu("Помоћ");
+        kakoKoristiti = new JMenuItem("Како користити апликацију");
+        kakoKoristiti.addActionListener(al->{
+            //open site on browser
+            Desktop desktop = Desktop.getDesktop();
+            try {
+                desktop.browse(new URI("https://github.com/markovicb1/monthly-cash-monitoring#how-to-use-v101"));
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null,"Can't reach site.");
+            } catch (URISyntaxException e) {
+                JOptionPane.showMessageDialog(null,"Can't reach site.");
+            }
+        });
+        oAplikaciji = new JMenuItem("О апликацији");
+        oAplikaciji.addActionListener(al->{
+            new OAplikaciji();
+        });
+        pomoc.add(kakoKoristiti);
+        pomoc.add(oAplikaciji);
+        menuBar.add(podaci);
+        menuBar.add(pomoc);
+
         add(side);
         add(container);
+        setJMenuBar(menuBar);
         setVisible(true);
         revalidate();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
