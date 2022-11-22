@@ -28,6 +28,7 @@ public class KorisnickoOkruzenje extends JFrame {
     public static final String AKTIVNOST_FLAG = "Aktivnost card";
     public static final String ISTORIJA_FLAG = "Istorija card";
     public static final String IZMENI_FLAG = "Izmeni aktivnost card";
+    public static final String IZMENI_TRANS_FLAG = "Izmeni transakciju card";
     public static final String GENERISI_FLAG = "Generisi godisnji izvestaj card";
     public static final String HELP_FLAG = "Help card";
     public static final String ABOUT_FLAG = "O aplikaciji card";
@@ -43,6 +44,7 @@ public class KorisnickoOkruzenje extends JFrame {
     private JPanel aktivnost;
     private JPanel istorija;
     private JPanel izmeniAktivnostCard;
+    private JPanel izmeniTransakcijuCard;
     private JPanel generisiGodisnjiCard;
     private JPanel helpCard;
     private JPanel oAplikacijiCard;
@@ -100,6 +102,7 @@ public class KorisnickoOkruzenje extends JFrame {
     private JMenu podaci;
     private JMenu pomoc;
     private JMenuItem izmeniAktivnost;
+    private JMenuItem izmeniTransakciju;
     private JMenuItem generisiPDF;
     private JMenuItem kakoKoristiti;
     private JMenuItem oAplikaciji;
@@ -109,6 +112,21 @@ public class KorisnickoOkruzenje extends JFrame {
     private JComboBox izmeniAktivnostCB;
     private JLabel izmeniAktivnostIzaberi;
     private JButton izmeniAktivnostBtn;
+
+    private JLabel izmeniTransakcijuNaslov;
+    private JLabel izmeniTransakcijuDatumLb;
+    private JTextField izmeniTransakcijuGodinaTf;
+    private JTextField izmeniTransakcijuMesecTf;
+    private JTextField izmeniTransakcijuDanTf;
+    private DefaultListModel listModel;
+    private JButton izmeniTransakcijuGenerisiTransakcijeBtn;
+    private JList izmeniTransakcijuLista;
+    private JLabel izmeniTransakcijuNovacLb;
+    private JTextField izmeniTransakcijuNovacTf;
+    private JButton izmeniTransakcijuUpisiBtn;
+    private JScrollPane izmeniTransakcijuScroll;
+    private int[] idTransakcija;
+
     private void showSidePanel() {
         side = new JPanel(null);
         side.setBounds(0, 0, WINDOW_WIDTH / 4, WINDOW_HEIGHT);
@@ -120,7 +138,7 @@ public class KorisnickoOkruzenje extends JFrame {
         add(side);
     }
 
-    private String[] updatePrihodCB(){
+    private String[] updatePrihodCB() {
         String[] data = {};
         try {
             Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
@@ -151,7 +169,7 @@ public class KorisnickoOkruzenje extends JFrame {
         }
     }
 
-    private String[] updateRashodCB(){
+    private String[] updateRashodCB() {
         String[] data = {};
         try {
             Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
@@ -182,7 +200,7 @@ public class KorisnickoOkruzenje extends JFrame {
         }
     }
 
-    private String[] updateIzmeniAktivnost(){
+    private String[] updateIzmeniAktivnost() {
         String[] data = {};
         try {
             Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
@@ -328,7 +346,7 @@ public class KorisnickoOkruzenje extends JFrame {
                     prihodKolicinaNovcaTf.setText("");
                     izmeniAktivnostCB.removeAllItems();
                     String[] newIzmeniData = updateIzmeniAktivnost();
-                    for(String s : newIzmeniData)
+                    for (String s : newIzmeniData)
                         izmeniAktivnostCB.addItem(s);
                 } catch (SQLException e) {
                     JOptionPane.showMessageDialog(null, e.getMessage());
@@ -466,7 +484,7 @@ public class KorisnickoOkruzenje extends JFrame {
                     rashodKolicinaNovcaTf.setText("");
                     izmeniAktivnostCB.removeAllItems();
                     String[] newIzmeniData = updateRashodCB();
-                    for(String s: newIzmeniData)
+                    for (String s : newIzmeniData)
                         izmeniAktivnostCB.addItem(s);
                 } catch (SQLException e) {
                     JOptionPane.showMessageDialog(null, e.getMessage());
@@ -540,8 +558,9 @@ public class KorisnickoOkruzenje extends JFrame {
                 connection.close();
                 //JOptionPane.showMessageDialog(null, "Podaci uneseni");
                 String[] newIzmeniData = updateIzmeniAktivnost();
+
                 izmeniAktivnostCB.removeAllItems();
-                for(String s:newIzmeniData)
+                for (String s : newIzmeniData)
                     izmeniAktivnostCB.addItem(s);
                 aktivnostImeTf.setText("");
             } catch (GreskaPraznaPolja e) {
@@ -560,7 +579,7 @@ public class KorisnickoOkruzenje extends JFrame {
         aktivnost.add(aktivnostUnesi);
     }
 
-    private void generisiTabelu(){
+    private void generisiTabelu() {
         try {
             if (istorijaDatumMesec.getText().isBlank() || istorijaDatumGodina.getText().isBlank())
                 throw new GreskaPraznaPolja();
@@ -616,6 +635,7 @@ public class KorisnickoOkruzenje extends JFrame {
             JOptionPane.showMessageDialog(null, "Унети сва поља!");
         }
     }
+
     private void populateIstorijaPanel() {
         istorija = new JPanel(null);
         istorija.setBackground(new Color(199, 211, 212));
@@ -668,8 +688,8 @@ public class KorisnickoOkruzenje extends JFrame {
         istorijaDatumMesec.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    if(!istorijaDatumGodina.getText().isBlank() || !istorijaDatumMesec.getText().isBlank())
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    if (!istorijaDatumGodina.getText().isBlank() || !istorijaDatumMesec.getText().isBlank())
                         defaultTableModel.setRowCount(0);
                     generisiTabelu();
                 }
@@ -677,7 +697,7 @@ public class KorisnickoOkruzenje extends JFrame {
         });
 
         istorijaGenerisi.addActionListener(al -> {
-            if(!istorijaDatumGodina.getText().isBlank() || !istorijaDatumMesec.getText().isBlank())
+            if (!istorijaDatumGodina.getText().isBlank() || !istorijaDatumMesec.getText().isBlank())
                 defaultTableModel.setRowCount(0);
             generisiTabelu();
         });
@@ -693,7 +713,7 @@ public class KorisnickoOkruzenje extends JFrame {
         istorija.add(istorijaObrisi);
     }
 
-    public void populateIzmeniAktivnostPanel(){
+    public void populateIzmeniAktivnostPanel() {
         izmeniAktivnostCard = new JPanel(null);
         izmeniAktivnostCard.setBackground(new Color(199, 211, 212));
 
@@ -748,7 +768,7 @@ public class KorisnickoOkruzenje extends JFrame {
         izmeniAktivnostBtn = new JButton("Ажурирај");
         izmeniAktivnostBtn.setBounds(WINDOW_WIDTH / 4 + 15, WINDOW_HEIGHT - 80, 120, 20);
         String[] finalData = data;
-        izmeniAktivnostBtn.addActionListener(al->{
+        izmeniAktivnostBtn.addActionListener(al -> {
             try {
                 Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
                 System.out.println("Connected to database.");
@@ -770,20 +790,23 @@ public class KorisnickoOkruzenje extends JFrame {
                 statement.executeUpdate(sql);
                 System.out.println("Updated DB");
                 connection.close();
-                int ind = izmeniAktivnostCB.getSelectedIndex();
-                finalData[ind] = izmeniAktivnostNovoImeTf.getText();
+
+                String[] finalDataNew = updateIzmeniAktivnost(); //azurirane vrednosti za combobox
+                //int ind = izmeniAktivnostCB.getSelectedIndex();
+                //finalDataNew[ind] = izmeniAktivnostNovoImeTf.getText(); //OVDE PUCA jer finalData nema novounetu aktivnost
                 izmeniAktivnostCB.removeAllItems();
-                for(String s:finalData)
+                for (String s : finalDataNew)
                     izmeniAktivnostCB.addItem(s);
                 izmeniAktivnostNovoImeTf.setText("");
                 defaultTableModel.setRowCount(0);
+
                 String[] newPrihodData = updatePrihodCB();
                 String[] newRashodData = updateRashodCB();
                 prihodCB.removeAllItems();
-                for(String s:newPrihodData)
+                for (String s : newPrihodData)
                     prihodCB.addItem(s);
                 rashodCB.removeAllItems();
-                for(String s:newRashodData)
+                for (String s : newRashodData)
                     rashodCB.addItem(s);
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, e.getMessage());
@@ -796,6 +819,165 @@ public class KorisnickoOkruzenje extends JFrame {
         izmeniAktivnostCard.add(izmeniAktivnostNovoIme);
         izmeniAktivnostCard.add(izmeniAktivnostNovoImeTf);
         izmeniAktivnostCard.add(izmeniAktivnostBtn);
+    }
+
+    private void populateIzmeniTransakcijuPanel() {
+        izmeniTransakcijuCard = new JPanel(null);
+        izmeniTransakcijuCard.setBackground(new Color(199, 211, 212));
+
+        izmeniTransakcijuNaslov = new JLabel("Промените количину новца за трансакцију");
+        izmeniTransakcijuNaslov.setFont(new Font("Times New Roman", Font.BOLD, 16));
+        izmeniTransakcijuNaslov.setBounds(5 * WINDOW_WIDTH / 8 - 175, 10, 350, 20);
+
+        //uneti mesec i godinu u kojoj se nalazi zeljena aktivnost ili ceo datum ako se zna na koju se tacno misli
+        izmeniTransakcijuDatumLb = new JLabel("Унети датум YYYY-MM + DD за тачност");
+        izmeniTransakcijuDatumLb.setBounds(WINDOW_WIDTH / 4 + 7, 83, 280, 10);
+        izmeniTransakcijuDatumLb.setFont(new Font("Times New Roman", Font.BOLD, 14));
+        izmeniTransakcijuGodinaTf = new JTextField();
+        izmeniTransakcijuGodinaTf.setBounds(WINDOW_WIDTH / 4 + 5 + 285, 80, 50, 20);
+        izmeniTransakcijuGodinaTf.setHorizontalAlignment(0);
+        izmeniTransakcijuMesecTf = new JTextField();
+        izmeniTransakcijuMesecTf.setBounds(WINDOW_WIDTH / 4 + 5 + 285 + 55, 80, 50, 20);
+        izmeniTransakcijuMesecTf.setHorizontalAlignment(0);
+        izmeniTransakcijuDanTf = new JTextField();
+        izmeniTransakcijuDanTf.setBounds(WINDOW_WIDTH / 4 + 5 + 285 + 55 + 55, 80, 50, 20);
+        izmeniTransakcijuDanTf.setHorizontalAlignment(0);
+
+        listModel = new DefaultListModel<String>();
+
+        izmeniTransakcijuGenerisiTransakcijeBtn = new JButton("Прикажи");
+        izmeniTransakcijuGenerisiTransakcijeBtn.setBounds(WINDOW_WIDTH - 120, 110, 90, 20);
+        izmeniTransakcijuGenerisiTransakcijeBtn.addActionListener(al -> {
+            if (listModel.getSize() > 0)
+                listModel.clear();
+            try {
+                if (izmeniTransakcijuGodinaTf.getText().isBlank() || izmeniTransakcijuMesecTf.getText().isBlank())
+                    throw new GreskaPraznaPolja();
+                String startDate = "/", endDate = "/", fullDate = "/";
+                if (!izmeniTransakcijuDanTf.getText().isBlank()) {
+                    fullDate = "DATE '" + izmeniTransakcijuGodinaTf.getText() + "-" + izmeniTransakcijuMesecTf.getText() + "-" + izmeniTransakcijuDanTf.getText() + "'";
+                } else {
+                    startDate = "DATE '" + izmeniTransakcijuGodinaTf.getText() + "-" + izmeniTransakcijuMesecTf.getText() + "-01'";
+                    int mesec = Integer.valueOf(izmeniTransakcijuMesecTf.getText());
+                    mesec = (mesec == 12 ? mesec = 1 : mesec + 1);
+                    String mesecStr = "";
+                    if (mesec < 10)
+                        mesecStr = "0" + String.valueOf(mesec);
+                    else
+                        mesecStr = String.valueOf(mesec);
+
+                    endDate = "DATE '" + izmeniTransakcijuGodinaTf.getText() + "-" + mesecStr + "-01'";
+                }
+
+                Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
+                String sql = "";
+                if (fullDate == "/") {
+                    sql = "SELECT \"Transactions\".id, \"Activities\".name, \"Transactions\".amount, \"Transactions\".date\n" +
+                            "FROM \"Transactions\"\n" +
+                            "JOIN \"Activities\" ON \"Transactions\".id_activity = \"Activities\".id\n" +
+                            "WHERE \"Transactions\".date >= " + startDate + " AND \"Transactions\".date < " + endDate + "\n" +
+                            "ORDER BY \"Transactions\".date DESC;";
+                } else {
+                    sql = "SELECT \"Transactions\".id, \"Activities\".name, \"Transactions\".amount, \"Transactions\".date\n" +
+                            "FROM \"Transactions\"\n" +
+                            "JOIN \"Activities\" ON \"Transactions\".id_activity = \"Activities\".id\n" +
+                            "WHERE \"Transactions\".date = " + fullDate + ";";
+                }
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql);
+                int cnt = 0; //limit to max 6 results displayed
+                idTransakcija = new int[7];
+                while (resultSet.next()) {
+                    cnt++;
+                    if (cnt == 7)
+                        break;
+                    StringBuilder sb = new StringBuilder();
+                    idTransakcija[cnt - 1] = resultSet.getInt(1);
+                    sb.append(resultSet.getString(2));
+                    sb.append(" ");
+                    sb.append(resultSet.getString(3));
+                    sb.append("дин ");
+                    sb.append(resultSet.getString(4));
+                    listModel.addElement(sb.toString());
+                }
+                resultSet.close();
+                statement.close();
+                if (listModel.getSize() == 0)
+                    JOptionPane.showMessageDialog(null, "Нема резултата претраге.");
+                izmeniTransakcijuLista.setModel(listModel);
+            } catch (SQLException se) {
+                JOptionPane.showMessageDialog(null, "SQL ERROR: " + se.getMessage());
+            } catch (GreskaPraznaPolja e) {
+                JOptionPane.showMessageDialog(null, "Унети сва поља.");
+            }
+        });
+
+        izmeniTransakcijuLista = new JList(listModel);
+        izmeniTransakcijuLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        izmeniTransakcijuLista.setLayoutOrientation(JList.VERTICAL);
+
+        izmeniTransakcijuScroll = new JScrollPane(izmeniTransakcijuLista);
+        izmeniTransakcijuScroll.setBounds(WINDOW_WIDTH / 4 + 25, 130, 225, 110);
+
+        izmeniTransakcijuNovacLb = new JLabel("Нова количина новца");
+        izmeniTransakcijuNovacLb.setFont(new Font("Times New Roman", Font.BOLD, 14));
+        izmeniTransakcijuNovacLb.setBounds(WINDOW_WIDTH - 170, 130 + 50, 150, 10); //WINDOW_WIDTH / 4 + izmeniTransakcijuDatumLb.getWidth()
+        izmeniTransakcijuNovacTf = new JTextField();
+        izmeniTransakcijuNovacTf.setBounds(WINDOW_WIDTH - 80, 205, 50, 20);
+        izmeniTransakcijuNovacTf.setHorizontalAlignment(0);
+
+        izmeniTransakcijuUpisiBtn = new JButton("Промени");
+        izmeniTransakcijuUpisiBtn.setBounds(WINDOW_WIDTH - 120, 255, 90, 20);
+        izmeniTransakcijuUpisiBtn.addActionListener(al->{
+           int selected = izmeniTransakcijuLista.getSelectedIndex();
+           if(selected == -1)
+               JOptionPane.showMessageDialog(null,"Изабрати трансакцију која се мења.");
+           if(izmeniTransakcijuNovacTf.getText().isBlank())
+               JOptionPane.showMessageDialog(null,"Унети нову количину новца.");
+           try{
+               //ovaj odeljak je prebacen iz prostora iznad try bloka
+               String uzorak = (String)izmeniTransakcijuLista.getSelectedValue();
+               String[] delovi = uzorak.split(" ");
+               String staraTransakcija = delovi[delovi.length - 2]; //na primer -750din
+               char tipTransakcije = staraTransakcija.charAt(0);
+
+               Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
+               int novaVrednost = Math.abs(Integer.valueOf(izmeniTransakcijuNovacTf.getText()));
+               String sql = "UPDATE \"Transactions\"\n" +
+                       "SET amount = " + (tipTransakcije == '-' ? -novaVrednost : novaVrednost) + "\n" +
+                       "WHERE id = " + idTransakcija[izmeniTransakcijuLista.getSelectedIndex()] + ";";
+               Statement statement = connection.createStatement();
+               statement.executeUpdate(sql);
+               statement.close();
+               connection.close();
+               idTransakcija = null;
+               listModel.removeAllElements();
+               izmeniTransakcijuLista.setModel(listModel);
+               izmeniTransakcijuNovacTf.setText("");
+               izmeniTransakcijuGodinaTf.setText("");
+               izmeniTransakcijuMesecTf.setText("");
+               izmeniTransakcijuDanTf.setText("");
+               defaultTableModel.setRowCount(0);
+           }
+           catch (SQLException se){
+                JOptionPane.showMessageDialog(null,"SQL ERROR: " + se.getMessage());
+           }
+           catch (Exception e){
+                System.out.println("Error: " + e.getMessage());
+           }
+        });
+
+        izmeniTransakcijuCard.add(izmeniTransakcijuNaslov);
+        izmeniTransakcijuCard.add(izmeniTransakcijuDatumLb);
+        izmeniTransakcijuCard.add(izmeniTransakcijuDatumLb);
+        izmeniTransakcijuCard.add(izmeniTransakcijuGodinaTf);
+        izmeniTransakcijuCard.add(izmeniTransakcijuMesecTf);
+        izmeniTransakcijuCard.add(izmeniTransakcijuDanTf);
+        izmeniTransakcijuCard.add(izmeniTransakcijuGenerisiTransakcijeBtn);
+        izmeniTransakcijuCard.add(izmeniTransakcijuScroll);
+        izmeniTransakcijuCard.add(izmeniTransakcijuNovacLb);
+        izmeniTransakcijuCard.add(izmeniTransakcijuNovacTf);
+        izmeniTransakcijuCard.add(izmeniTransakcijuUpisiBtn);
     }
 
     public KorisnickoOkruzenje() {
@@ -821,12 +1003,15 @@ public class KorisnickoOkruzenje extends JFrame {
         populateIstorijaPanel();
         //configuring izmeniAktivnost card
         populateIzmeniAktivnostPanel();
+        //configuring izmeniTransakciju card
+        populateIzmeniTransakcijuPanel();
 
         container.add(prihod, PRIHOD_FLAG);
         container.add(rashod, RASHOD_FLAG);
         container.add(aktivnost, AKTIVNOST_FLAG);
         container.add(istorija, ISTORIJA_FLAG);
-        container.add(izmeniAktivnostCard,IZMENI_FLAG);
+        container.add(izmeniAktivnostCard, IZMENI_FLAG);
+        container.add(izmeniTransakcijuCard, IZMENI_TRANS_FLAG);
 
         //configuring side panel
         side = new JPanel(null);
@@ -875,31 +1060,37 @@ public class KorisnickoOkruzenje extends JFrame {
         podaci = new JMenu("Подаци");
         podaci.setMnemonic(KeyEvent.VK_P);
         izmeniAktivnost = new JMenuItem("Измени постојећу активност");
-        izmeniAktivnost.addActionListener(al->{
+        izmeniAktivnost.addActionListener(al -> {
             cardLayout.show(container, IZMENI_FLAG);
             showSidePanel();
         });
+        izmeniTransakciju = new JMenuItem("Измени извршену трансакцију");
+        izmeniTransakciju.addActionListener(al -> {
+            cardLayout.show(container, IZMENI_TRANS_FLAG);
+            showSidePanel();
+        });
         generisiPDF = new JMenuItem("Генериши годишњи ПДФ");
-        generisiPDF.addActionListener(al->{
+        generisiPDF.addActionListener(al -> {
             System.out.println("APACHE PDFBOX");
         });
         podaci.add(izmeniAktivnost);
+        podaci.add(izmeniTransakciju);
         podaci.add(generisiPDF);
         pomoc = new JMenu("Помоћ");
         kakoKoristiti = new JMenuItem("Како користити апликацију");
-        kakoKoristiti.addActionListener(al->{
+        kakoKoristiti.addActionListener(al -> {
             //open site on browser
             Desktop desktop = Desktop.getDesktop();
             try {
                 desktop.browse(new URI("https://github.com/markovicb1/monthly-cash-monitoring#how-to-use-v101"));
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(null,"Can't reach site.");
+                JOptionPane.showMessageDialog(null, "Can't reach site.");
             } catch (URISyntaxException e) {
-                JOptionPane.showMessageDialog(null,"Can't reach site.");
+                JOptionPane.showMessageDialog(null, "Can't reach site.");
             }
         });
         oAplikaciji = new JMenuItem("О апликацији");
-        oAplikaciji.addActionListener(al->{
+        oAplikaciji.addActionListener(al -> {
             new OAplikaciji();
         });
         pomoc.add(kakoKoristiti);

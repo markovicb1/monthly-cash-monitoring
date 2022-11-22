@@ -48,7 +48,7 @@ public class OAplikaciji extends JFrame {
         naslov.setFont(new Font("Times New Roman",Font.BOLD,13));
         naslov.setBounds(5 * WINDOW_WIDTH / 8 - 112, 10, 270, 20);
 
-        JLabel verzija = new JLabel("Верзија            v1.1");
+        JLabel verzija = new JLabel("Верзија            v1.2");
         verzija.setFont(new Font("Times New Roman",Font.ITALIC,13));
         verzija.setBounds(WINDOW_WIDTH / 3 + 5,70,150,20);
 
