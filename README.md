@@ -143,7 +143,7 @@ If you are not fammiliar with adding JARs as external libraries in Java projects
 - Eclipse Java IDE: [WikiHow](https://www.wikihow.com/Add-JARs-to-Project-Build-Paths-in-Eclipse-(Java))
 
 ## Photo (SRB edition)
-![CASHGUI](https://user-images.githubusercontent.com/115867204/199236213-53f256af-265a-4058-b555-4260dfa24967.jpg)
+![Notes slika](https://user-images.githubusercontent.com/115867204/201484618-63c2df1d-17a4-4302-84fd-883be99cea49.png)
 
 # Future changes
 
