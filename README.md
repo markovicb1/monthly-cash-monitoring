@@ -1,9 +1,9 @@
 # monthly-cash-monitoring // `ENG` Monthly cash flow checker / `SRB` Нотес потрошње
-## ***Java Swing app for monthly monitoring of your personal cash flow - srb edition***
+## ***Java Swing app for monthly and yearly monitoring of your personal cash flow - srb edition***
 
 ## Overview
 
-This personal **dynamic GUI** app helps you track all your incomes and expenses on monthly basis. It is **easy to use, light and user friendly**. See your cash flow in simple tabular view.
+This personal **dynamic GUI** app helps you track all your incomes and expenses on monthly basis. It is **easy to use, light and user friendly**. See your cash flow in simple tabular view. Generate PDF to view your yearly statistics!
 
 ## Development
 
@@ -21,13 +21,24 @@ Users and Activities are unique by Name.
 
 ## How to use `v1.0`[^1]
 
+***This also applies to versions 1.1 and 1.2***
+
 The app is divided in 2 segments: Side bar and central panel.
 
 The Side bar is used as context menu:
 - Add new Revenue
 - Add new Expense
 - Add new Activity
-- View Cash flow history
+- View Monthly Cash flow history
+
+The top bar, represented as menu, has 2 sections:
+- Data submenu
+  - Change Actions names
+  - Change Transactions money amount
+  - Generate yaerly statistics in PDF form
+- Help/About submenu
+  - How to use the app. Redirects exactly here
+  - The shortest possible info about the app
 
 The Central panel shows content of particular menu. Cash flow history shows tabular view of Transactions made in user-specified year and month, as well as the Balance at the end of that month.
 
@@ -136,6 +147,8 @@ Unfortunately, PostgreSQL doesn't have built-in/default DriverManager for Java l
 
 Additionally, you can download Third party LookAndFeel to make Java Swing more eye catching. I recommend using [FlatLaf](https://www.formdev.com/flatlaf/)
 
+***If you don't want to use LookAndFeel, remove the LookAndFeel method from the Main class***
+
 Downloaded files are Executable JARs, which should be added in Projects directory. After adding them, they should also be added as libraries in project.
 
 If you are not fammiliar with adding JARs as external libraries in Java projects, I recommend reading these articles:
@@ -145,15 +158,23 @@ If you are not fammiliar with adding JARs as external libraries in Java projects
 ## Photo (SRB edition)
 ![Notes slika](https://user-images.githubusercontent.com/115867204/201484618-63c2df1d-17a4-4302-84fd-883be99cea49.png)
 
+*Picture 1: Add new revenue*
+
+![Notes slika 2](https://user-images.githubusercontent.com/115867204/203429056-c2ae94f5-301f-4d27-bb5d-6614a751dc63.png)
+
+*Picture 2: View transaction history for particular month*
+
+![Notes slika 3](https://user-images.githubusercontent.com/115867204/203429592-3702176e-997f-44ab-bc07-7df09b30f271.png)
+
+*Picture 3: Change money amount for particular transaction*
+
 # Future changes
 
 Here's the list of upcoming changes:
 - English interface
-- Edit Activities directly through the app / ADDED
 - Make history graph
 - PDF view of history with additional statistics
-- About app page / ADDED
 
-[^1]: Version 1.0 is in Serbian Cyrilic only.
+[^1]: Version 1.0, 1.1 and 1.2 is in Serbian Cyrilic only.
 [^2]: Even though the newest version of Java is 19, it is recommended to use the LTS(Long time support) version, which is version 17
 [^3]: PostgreSQL JDBC Driver, commonly called pgJDBC is an open souce JDBC driver/API for Java. More about this project can be found [here](https://jdbc.postgresql.org/documentation/)
