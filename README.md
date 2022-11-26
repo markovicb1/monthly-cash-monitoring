@@ -143,7 +143,7 @@ VALUES ('Admin');
 
 ### Adding important external Libraries
 
-If you are fammiliar with the Apache Maven, you don't have to download anything but add dependencies to pom file:
+If you are familiar with the Apache Maven, you don't have to download anything but add dependencies to pom file:
 
 For Postgres DriverManager add:
 ```
