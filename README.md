@@ -141,7 +141,28 @@ VALUES ('Admin');
 ```
 11. Finally, the DB is ready to use
 
-### Adding important Libraries
+### Adding important external Libraries
+
+If you are fammiliar with the Apache Maven, you don't have to download anything but add dependencies to pom file:
+
+For Postgres DriverManager add:
+```
+<dependency>
+  <groupid>org.postgresql</groupid>
+  <artifactid>postgresql</artifactid>
+  <version>42.5.1</version>
+</dependency>
+```
+For FlatLaf (third party LookAndFeel) add this dependecy:
+```
+<dependency>
+  <groupId>com.formdev</groupId>
+  <artifactId>flatlaf</artifactId>
+  <version>2.6</version>
+</dependency>
+```
+
+***The section bellow is for those who don't use Apache Maven:***
 
 Unfortunately, PostgreSQL doesn't have built-in/default DriverManager for Java lang so it's necessary to download it separately from [here](https://jdbc.postgresql.org/download/)[^3].
 
