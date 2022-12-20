@@ -1,12 +1,9 @@
 package notesPotrosnje;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLightLaf;
-import com.formdev.flatlaf.IntelliJTheme;
 
 import javax.swing.*;
-import javax.swing.plaf.nimbus.State;
+import javax.swing.border.EtchedBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -20,7 +17,6 @@ import java.time.LocalDate;
 import java.util.Vector;
 
 public class KorisnickoOkruzenje extends JFrame {
-
     public static final int WINDOW_WIDTH = 640;
     public static final int WINDOW_HEIGHT = 335;
     public static final String PRIHOD_FLAG = "Prihod card";
@@ -29,13 +25,12 @@ public class KorisnickoOkruzenje extends JFrame {
     public static final String ISTORIJA_FLAG = "Istorija card";
     public static final String IZMENI_FLAG = "Izmeni aktivnost card";
     public static final String IZMENI_TRANS_FLAG = "Izmeni transakciju card";
-    public static final String GENERISI_FLAG = "Generisi godisnji izvestaj card";
-    public static final String HELP_FLAG = "Help card";
-    public static final String ABOUT_FLAG = "O aplikaciji card";
+
     private static final int userID = 1;
     private static final String dbURL = "jdbc:postgresql://localhost:5432/app_db";
     private static final String dbUsername = "postgres";
     private static final String dbPassword = "postgresbogdan";
+
 
     private JPanel side;
     private JPanel container;
@@ -45,15 +40,22 @@ public class KorisnickoOkruzenje extends JFrame {
     private JPanel istorija;
     private JPanel izmeniAktivnostCard;
     private JPanel izmeniTransakcijuCard;
-    private JPanel generisiGodisnjiCard;
-    private JPanel helpCard;
-    private JPanel oAplikacijiCard;
+    private CardLayout cardLayout;
+
+    private JMenuBar menuBar;
+    private JMenu podaci;
+    private JMenu pomoc;
+    private JMenuItem izmeniAktivnost;
+    private JMenuItem izmeniTransakciju;
+    private JMenuItem generisiPDF;
+    private JMenuItem kakoKoristiti;
+    private JMenuItem oAplikaciji;
+
     private JButton noviPrihod;
     private JButton noviRashod;
     private JButton dodajAktivnost;
     private JButton vidiIstoriju;
-    private CardLayout cardLayout;
-    private JLabel labelMenu;
+
     private JLabel prihodNaslov;
     private JLabel prihodTip;
     private JLabel prihodKolicina;
@@ -77,6 +79,7 @@ public class KorisnickoOkruzenje extends JFrame {
     private JTextField rashodDan;
     private JButton rashodDanasBtn;
     private JButton rashodUnesiBtn;
+
     private JLabel aktivnostNaslov;
     private JLabel aktivnostIme;
     private JTextField aktivnostImeTf;
@@ -85,6 +88,7 @@ public class KorisnickoOkruzenje extends JFrame {
     private JRadioButton aktivnostTipRashod;
     private ButtonGroup aktivnostRBGrupa;
     private JButton aktivnostUnesi;
+
     private JLabel istorijaNaslov;
     private JLabel istorijaDatum;
     private JTextField istorijaDatumGodina;
@@ -93,19 +97,10 @@ public class KorisnickoOkruzenje extends JFrame {
     private JScrollPane istorijaScroll;
     private JLabel istorijaSaldo;
     private JTextField istorijaSaldoTf;
-    private String[][] tableData;
     private JButton istorijaGenerisi;
     private JButton istorijaObrisi;
     private DefaultTableModel defaultTableModel;
 
-    private JMenuBar menuBar;
-    private JMenu podaci;
-    private JMenu pomoc;
-    private JMenuItem izmeniAktivnost;
-    private JMenuItem izmeniTransakciju;
-    private JMenuItem generisiPDF;
-    private JMenuItem kakoKoristiti;
-    private JMenuItem oAplikaciji;
     private JLabel izmeniАktivnostNaslov;
     private JLabel izmeniAktivnostNovoIme;
     private JTextField izmeniAktivnostNovoImeTf;
@@ -131,10 +126,6 @@ public class KorisnickoOkruzenje extends JFrame {
         side = new JPanel(null);
         side.setBounds(0, 0, WINDOW_WIDTH / 4, WINDOW_HEIGHT);
         side.setBackground(new Color(125, 22, 250));
-        labelMenu = new JLabel("MENI");
-        labelMenu.setBounds(WINDOW_WIDTH / 8 - 20, 25, 50, 10);
-        labelMenu.setFont(new Font("Times New Roman", Font.BOLD, 15));
-        labelMenu.setForeground(new Color(199, 211, 212));
         add(side);
     }
 
@@ -231,6 +222,117 @@ public class KorisnickoOkruzenje extends JFrame {
         }
     }
 
+    private void configureCards() {
+        cardLayout = new CardLayout();
+        container = new JPanel(cardLayout);
+        container.setBounds(WINDOW_WIDTH / 4, 0, 3 * WINDOW_WIDTH / 4, WINDOW_HEIGHT);
+    }
+
+    private void configureCentralPanel() {
+        //configuring prihod card
+        populatePrihodPanel();
+        //configuring rashod card
+        populateRashodPanel();
+        //configuring aktivnost card
+        populateAktivnostPanel();
+        //configuring istorija card
+        populateIstorijaPanel();
+        //configuring izmeniAktivnost card
+        populateIzmeniAktivnostPanel();
+        //configuring izmeniTransakciju card
+        populateIzmeniTransakcijuPanel();
+
+        container.add(prihod, PRIHOD_FLAG);
+        container.add(rashod, RASHOD_FLAG);
+        container.add(aktivnost, AKTIVNOST_FLAG);
+        container.add(istorija, ISTORIJA_FLAG);
+        container.add(izmeniAktivnostCard, IZMENI_FLAG);
+        container.add(izmeniTransakcijuCard, IZMENI_TRANS_FLAG);
+    }
+
+    private void configureSidePanel() {
+        side = new JPanel(null);
+        side.setBounds(0, 0, WINDOW_WIDTH / 4, WINDOW_HEIGHT);
+        side.setBackground(new Color(96, 63, 131));
+
+        noviPrihod = new JButton("Нови приход");
+        noviPrihod.setBounds(WINDOW_WIDTH / 8 - 65, 60, 130, 30);
+        noviPrihod.addActionListener(al -> {
+            cardLayout.show(container, PRIHOD_FLAG);
+            showSidePanel();
+        });
+
+        noviRashod = new JButton("Нови расход");
+        noviRashod.setBounds(WINDOW_WIDTH / 8 - 65, 110, 130, 30);
+        noviRashod.addActionListener(al -> {
+            cardLayout.show(container, RASHOD_FLAG);
+            showSidePanel();
+        });
+
+        dodajAktivnost = new JButton("Додај активност");
+        dodajAktivnost.setBounds(WINDOW_WIDTH / 8 - 65, 160, 130, 30);
+        dodajAktivnost.addActionListener(al -> {
+            cardLayout.show(container, AKTIVNOST_FLAG);
+            showSidePanel();
+        });
+
+        vidiIstoriju = new JButton("Историја");
+        vidiIstoriju.setBounds(WINDOW_WIDTH / 8 - 65, 210, 130, 30);
+        vidiIstoriju.addActionListener(al -> {
+            cardLayout.show(container, ISTORIJA_FLAG);
+            showSidePanel();
+        });
+
+        side.add(noviPrihod);
+        side.add(noviRashod);
+        side.add(dodajAktivnost);
+        side.add(vidiIstoriju);
+    }
+
+    private void configureMenus() {
+        menuBar = new JMenuBar();
+        podaci = new JMenu("Подаци");
+        podaci.setMnemonic(KeyEvent.VK_P);
+        izmeniAktivnost = new JMenuItem("Измени постојећу активност");
+        izmeniAktivnost.addActionListener(al -> {
+            cardLayout.show(container, IZMENI_FLAG);
+            showSidePanel();
+        });
+        izmeniTransakciju = new JMenuItem("Измени извршену трансакцију");
+        izmeniTransakciju.addActionListener(al -> {
+            cardLayout.show(container, IZMENI_TRANS_FLAG);
+            showSidePanel();
+        });
+        generisiPDF = new JMenuItem("Генериши годишњи ПДФ");
+        generisiPDF.addActionListener(al -> {
+            PDFMaker maker = new PDFMaker(this);
+        });
+        podaci.add(izmeniAktivnost);
+        podaci.add(izmeniTransakciju);
+        podaci.add(generisiPDF);
+        pomoc = new JMenu("Помоћ");
+        kakoKoristiti = new JMenuItem("Како користити апликацију");
+        kakoKoristiti.addActionListener(al -> {
+            //open site on browser
+            Desktop desktop = Desktop.getDesktop();
+            try {
+                desktop.browse(new URI("https://github.com/markovicb1/monthly-cash-monitoring#how-to-use-v101"));
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "Can't reach site.");
+            } catch (URISyntaxException e) {
+                JOptionPane.showMessageDialog(null, "Can't reach site.");
+            }
+        });
+        oAplikaciji = new JMenuItem("О апликацији");
+        oAplikaciji.addActionListener(al -> {
+            new OAplikaciji(this);
+        });
+        pomoc.add(kakoKoristiti);
+        pomoc.add(oAplikaciji);
+        menuBar.add(podaci);
+        menuBar.add(pomoc);
+    }
+
     private void populatePrihodPanel() {
         prihod = new JPanel(null);
         prihod.setBackground(new Color(199, 211, 212));
@@ -272,7 +374,6 @@ public class KorisnickoOkruzenje extends JFrame {
         }
         prihodCB = new JComboBox(data);
         prihodCB.setEditable(false);
-        //prihodCB.setSelectedIndex(0);
         prihodCB.setFont(new Font("Times New Roman", Font.ITALIC, 13));
         prihodCB.setBounds(5 * WINDOW_WIDTH / 8 - 75, 70, 150, 20);
 
@@ -314,8 +415,7 @@ public class KorisnickoOkruzenje extends JFrame {
                     throw new GreskaPraznaPolja();
                 }
                 String dateString = prihodGodina.getText() + "-" + prihodMesec.getText() + "-" + prihodDan.getText();
-                java.sql.Date dateSQL = java.sql.Date.valueOf(dateString);
-                //SQL
+                Date dateSQL = Date.valueOf(dateString);
                 try {
                     Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
                     System.out.println("Connected to database.");
@@ -339,7 +439,6 @@ public class KorisnickoOkruzenje extends JFrame {
                     connection.close();
                     defaultTableModel.setRowCount(0);
                     istorijaSaldoTf.setText("");
-                    //JOptionPane.showMessageDialog(null, "Podaci uneseni");
                     prihodGodina.setText("");
                     prihodMesec.setText("");
                     prihodDan.setText("");
@@ -380,7 +479,6 @@ public class KorisnickoOkruzenje extends JFrame {
         rashodTip.setFont(new Font("Times New Roman", Font.BOLD, 14));
         rashodTip.setBounds(WINDOW_WIDTH / 4 + 15, 70, 80, 20);
 
-        //initialy filling ComboBox data
         String[] data = {};
         try {
             Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
@@ -452,7 +550,7 @@ public class KorisnickoOkruzenje extends JFrame {
                     throw new GreskaPraznaPolja();
                 }
                 String dateString = rashodGodina.getText() + "-" + rashodMesec.getText() + "-" + rashodDan.getText();
-                java.sql.Date dateSQL = java.sql.Date.valueOf(dateString);
+                Date dateSQL = Date.valueOf(dateString);
                 //SQL
                 try {
                     Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
@@ -477,7 +575,6 @@ public class KorisnickoOkruzenje extends JFrame {
                     connection.close();
                     defaultTableModel.setRowCount(0);
                     istorijaSaldoTf.setText("");
-                    //JOptionPane.showMessageDialog(null, "Podaci uneseni");
                     rashodGodina.setText("");
                     rashodMesec.setText("");
                     rashodDan.setText("");
@@ -556,7 +653,6 @@ public class KorisnickoOkruzenje extends JFrame {
                     rashodCB.addItem(aktivnostImeTf.getText());
                 }
                 connection.close();
-                //JOptionPane.showMessageDialog(null, "Podaci uneseni");
                 String[] newIzmeniData = updateIzmeniAktivnost();
 
                 izmeniAktivnostCB.removeAllItems();
@@ -591,8 +687,12 @@ public class KorisnickoOkruzenje extends JFrame {
                 mesecStr = "0" + String.valueOf(mesec);
             else
                 mesecStr = String.valueOf(mesec);
-
-            String endDate = "DATE '" + istorijaDatumGodina.getText() + "-" + mesecStr + "-01'";
+            String godinaNova = istorijaDatumGodina.getText();
+            if (mesec == 1) {
+                int godinaStara = Integer.valueOf(godinaNova) + 1;
+                godinaNova = String.valueOf(godinaStara);
+            }
+            String endDate = "DATE '" + godinaNova + "-" + mesecStr + "-01'";
             try {
                 Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
                 Statement statement = connection.createStatement();
@@ -792,8 +892,6 @@ public class KorisnickoOkruzenje extends JFrame {
                 connection.close();
 
                 String[] finalDataNew = updateIzmeniAktivnost(); //azurirane vrednosti za combobox
-                //int ind = izmeniAktivnostCB.getSelectedIndex();
-                //finalDataNew[ind] = izmeniAktivnostNovoImeTf.getText(); //OVDE PUCA jer finalData nema novounetu aktivnost
                 izmeniAktivnostCB.removeAllItems();
                 for (String s : finalDataNew)
                     izmeniAktivnostCB.addItem(s);
@@ -829,7 +927,6 @@ public class KorisnickoOkruzenje extends JFrame {
         izmeniTransakcijuNaslov.setFont(new Font("Times New Roman", Font.BOLD, 16));
         izmeniTransakcijuNaslov.setBounds(5 * WINDOW_WIDTH / 8 - 175, 10, 350, 20);
 
-        //uneti mesec i godinu u kojoj se nalazi zeljena aktivnost ili ceo datum ako se zna na koju se tacno misli
         izmeniTransakcijuDatumLb = new JLabel("Унети датум YYYY-MM + DD за тачност");
         izmeniTransakcijuDatumLb.setBounds(WINDOW_WIDTH / 4 + 7, 83, 280, 10);
         izmeniTransakcijuDatumLb.setFont(new Font("Times New Roman", Font.BOLD, 14));
@@ -866,7 +963,12 @@ public class KorisnickoOkruzenje extends JFrame {
                     else
                         mesecStr = String.valueOf(mesec);
 
-                    endDate = "DATE '" + izmeniTransakcijuGodinaTf.getText() + "-" + mesecStr + "-01'";
+                    String godinaStr = izmeniTransakcijuGodinaTf.getText();
+                    if(mesec == 1){
+                        int godinaStara = Integer.parseInt(godinaStr) + 1;
+                        godinaStr = String.valueOf(godinaStara);
+                    }
+                    endDate = "DATE '" + godinaStr + "-" + mesecStr + "-01'";
                 }
 
                 Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
@@ -928,43 +1030,40 @@ public class KorisnickoOkruzenje extends JFrame {
 
         izmeniTransakcijuUpisiBtn = new JButton("Промени");
         izmeniTransakcijuUpisiBtn.setBounds(WINDOW_WIDTH - 120, 255, 90, 20);
-        izmeniTransakcijuUpisiBtn.addActionListener(al->{
-           int selected = izmeniTransakcijuLista.getSelectedIndex();
-           if(selected == -1)
-               JOptionPane.showMessageDialog(null,"Изабрати трансакцију која се мења.");
-           if(izmeniTransakcijuNovacTf.getText().isBlank())
-               JOptionPane.showMessageDialog(null,"Унети нову количину новца.");
-           try{
-               //ovaj odeljak je prebacen iz prostora iznad try bloka
-               String uzorak = (String)izmeniTransakcijuLista.getSelectedValue();
-               String[] delovi = uzorak.split(" ");
-               String staraTransakcija = delovi[delovi.length - 2]; //na primer -750din
-               char tipTransakcije = staraTransakcija.charAt(0);
+        izmeniTransakcijuUpisiBtn.addActionListener(al -> {
+            int selected = izmeniTransakcijuLista.getSelectedIndex();
+            if (selected == -1)
+                JOptionPane.showMessageDialog(null, "Изабрати трансакцију која се мења.");
+            if (izmeniTransakcijuNovacTf.getText().isBlank())
+                JOptionPane.showMessageDialog(null, "Унети нову количину новца.");
+            try {
+                String uzorak = (String) izmeniTransakcijuLista.getSelectedValue();
+                String[] delovi = uzorak.split(" ");
+                String staraTransakcija = delovi[delovi.length - 2];
+                char tipTransakcije = staraTransakcija.charAt(0);
 
-               Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
-               int novaVrednost = Math.abs(Integer.valueOf(izmeniTransakcijuNovacTf.getText()));
-               String sql = "UPDATE \"Transactions\"\n" +
-                       "SET amount = " + (tipTransakcije == '-' ? -novaVrednost : novaVrednost) + "\n" +
-                       "WHERE id = " + idTransakcija[izmeniTransakcijuLista.getSelectedIndex()] + ";";
-               Statement statement = connection.createStatement();
-               statement.executeUpdate(sql);
-               statement.close();
-               connection.close();
-               idTransakcija = null;
-               listModel.removeAllElements();
-               izmeniTransakcijuLista.setModel(listModel);
-               izmeniTransakcijuNovacTf.setText("");
-               izmeniTransakcijuGodinaTf.setText("");
-               izmeniTransakcijuMesecTf.setText("");
-               izmeniTransakcijuDanTf.setText("");
-               defaultTableModel.setRowCount(0);
-           }
-           catch (SQLException se){
-                JOptionPane.showMessageDialog(null,"SQL ERROR: " + se.getMessage());
-           }
-           catch (Exception e){
+                Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
+                int novaVrednost = Math.abs(Integer.valueOf(izmeniTransakcijuNovacTf.getText()));
+                String sql = "UPDATE \"Transactions\"\n" +
+                        "SET amount = " + (tipTransakcije == '-' ? -novaVrednost : novaVrednost) + "\n" +
+                        "WHERE id = " + idTransakcija[izmeniTransakcijuLista.getSelectedIndex()] + ";";
+                Statement statement = connection.createStatement();
+                statement.executeUpdate(sql);
+                statement.close();
+                connection.close();
+                idTransakcija = null;
+                listModel.removeAllElements();
+                izmeniTransakcijuLista.setModel(listModel);
+                izmeniTransakcijuNovacTf.setText("");
+                izmeniTransakcijuGodinaTf.setText("");
+                izmeniTransakcijuMesecTf.setText("");
+                izmeniTransakcijuDanTf.setText("");
+                defaultTableModel.setRowCount(0);
+            } catch (SQLException se) {
+                JOptionPane.showMessageDialog(null, "SQL ERROR: " + se.getMessage());
+            } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
-           }
+            }
         });
 
         izmeniTransakcijuCard.add(izmeniTransakcijuNaslov);
@@ -981,122 +1080,17 @@ public class KorisnickoOkruzenje extends JFrame {
     }
 
     public KorisnickoOkruzenje() {
-        super("Нотес потрошње");
+        super("Нотес потрошње v2");
         //default settings for gui
         setBounds((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2 - WINDOW_WIDTH / 2, (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT);
         setResizable(false);
         URL imageURL = getClass().getClassLoader().getResource("b.png");
         super.setIconImage(Toolkit.getDefaultToolkit().getImage(imageURL));
 
-        //configuring cards
-        cardLayout = new CardLayout();
-        container = new JPanel(cardLayout);
-        container.setBounds(WINDOW_WIDTH / 4, 0, 3 * WINDOW_WIDTH / 4, WINDOW_HEIGHT);
-
-        //configuring prihod card
-        populatePrihodPanel();
-        //configuring rashod card
-        populateRashodPanel();
-        //configuring aktivnost card
-        populateAktivnostPanel();
-        //configuring istorija card
-        populateIstorijaPanel();
-        //configuring izmeniAktivnost card
-        populateIzmeniAktivnostPanel();
-        //configuring izmeniTransakciju card
-        populateIzmeniTransakcijuPanel();
-
-        container.add(prihod, PRIHOD_FLAG);
-        container.add(rashod, RASHOD_FLAG);
-        container.add(aktivnost, AKTIVNOST_FLAG);
-        container.add(istorija, ISTORIJA_FLAG);
-        container.add(izmeniAktivnostCard, IZMENI_FLAG);
-        container.add(izmeniTransakcijuCard, IZMENI_TRANS_FLAG);
-
-        //configuring side panel
-        side = new JPanel(null);
-        side.setBounds(0, 0, WINDOW_WIDTH / 4, WINDOW_HEIGHT);
-        side.setBackground(new Color(96, 63, 131));
-        labelMenu = new JLabel("MENI");
-        labelMenu.setBounds(WINDOW_WIDTH / 8 - 20, 25, 50, 10);
-        labelMenu.setFont(new Font("Times New Roman", Font.BOLD, 15));
-        labelMenu.setForeground(Color.WHITE);
-
-        noviPrihod = new JButton("Нови приход");
-        noviPrihod.setBounds(WINDOW_WIDTH / 8 - 65, 60, 130, 30);
-        noviPrihod.addActionListener(al -> {
-            cardLayout.show(container, PRIHOD_FLAG);
-            showSidePanel();
-        });
-
-        noviRashod = new JButton("Нови расход");
-        noviRashod.setBounds(WINDOW_WIDTH / 8 - 65, 110, 130, 30);
-        noviRashod.addActionListener(al -> {
-            cardLayout.show(container, RASHOD_FLAG);
-            showSidePanel();
-        });
-
-        dodajAktivnost = new JButton("Додај активност");
-        dodajAktivnost.setBounds(WINDOW_WIDTH / 8 - 65, 160, 130, 30);
-        dodajAktivnost.addActionListener(al -> {
-            cardLayout.show(container, AKTIVNOST_FLAG);
-            showSidePanel();
-        });
-
-        vidiIstoriju = new JButton("Историја");
-        vidiIstoriju.setBounds(WINDOW_WIDTH / 8 - 65, 210, 130, 30);
-        vidiIstoriju.addActionListener(al -> {
-            cardLayout.show(container, ISTORIJA_FLAG);
-            showSidePanel();
-        });
-
-        //side.add(labelMenu);
-        side.add(noviPrihod);
-        side.add(noviRashod);
-        side.add(dodajAktivnost);
-        side.add(vidiIstoriju);
-
-        menuBar = new JMenuBar();
-        podaci = new JMenu("Подаци");
-        podaci.setMnemonic(KeyEvent.VK_P);
-        izmeniAktivnost = new JMenuItem("Измени постојећу активност");
-        izmeniAktivnost.addActionListener(al -> {
-            cardLayout.show(container, IZMENI_FLAG);
-            showSidePanel();
-        });
-        izmeniTransakciju = new JMenuItem("Измени извршену трансакцију");
-        izmeniTransakciju.addActionListener(al -> {
-            cardLayout.show(container, IZMENI_TRANS_FLAG);
-            showSidePanel();
-        });
-        generisiPDF = new JMenuItem("Генериши годишњи ПДФ");
-        generisiPDF.addActionListener(al -> {
-            System.out.println("APACHE PDFBOX");
-        });
-        podaci.add(izmeniAktivnost);
-        podaci.add(izmeniTransakciju);
-        podaci.add(generisiPDF);
-        pomoc = new JMenu("Помоћ");
-        kakoKoristiti = new JMenuItem("Како користити апликацију");
-        kakoKoristiti.addActionListener(al -> {
-            //open site on browser
-            Desktop desktop = Desktop.getDesktop();
-            try {
-                desktop.browse(new URI("https://github.com/markovicb1/monthly-cash-monitoring#how-to-use-v101"));
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, "Can't reach site.");
-            } catch (URISyntaxException e) {
-                JOptionPane.showMessageDialog(null, "Can't reach site.");
-            }
-        });
-        oAplikaciji = new JMenuItem("О апликацији");
-        oAplikaciji.addActionListener(al -> {
-            new OAplikaciji();
-        });
-        pomoc.add(kakoKoristiti);
-        pomoc.add(oAplikaciji);
-        menuBar.add(podaci);
-        menuBar.add(pomoc);
+        configureCards();
+        configureCentralPanel();
+        configureSidePanel();
+        configureMenus();
 
         add(side);
         add(container);

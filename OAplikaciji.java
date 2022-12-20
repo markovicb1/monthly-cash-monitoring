@@ -1,21 +1,15 @@
 package notesPotrosnje;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-public class OAplikaciji extends JFrame {
+public class OAplikaciji extends JDialog {
     public static final int WINDOW_WIDTH = 400;
     public static final int WINDOW_HEIGHT = 300;
     private JPanel left;
@@ -48,7 +42,7 @@ public class OAplikaciji extends JFrame {
         naslov.setFont(new Font("Times New Roman",Font.BOLD,13));
         naslov.setBounds(5 * WINDOW_WIDTH / 8 - 112, 10, 270, 20);
 
-        JLabel verzija = new JLabel("Верзија            v1.2");
+        JLabel verzija = new JLabel("Верзија            v2.0");
         verzija.setFont(new Font("Times New Roman",Font.ITALIC,13));
         verzija.setBounds(WINDOW_WIDTH / 3 + 5,70,150,20);
 
@@ -82,14 +76,15 @@ public class OAplikaciji extends JFrame {
         return right;
     }
 
-    public OAplikaciji(){
-        super("О Апликацији");
+    public OAplikaciji(JFrame parent){
+        super(parent, "О Апликацији",ModalityType.APPLICATION_MODAL);
         //default settings for gui
         setBounds((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2 - WINDOW_WIDTH / 2, (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT);
         setResizable(false);
         URL imageURL = getClass().getClassLoader().getResource("b.png");
         super.setIconImage(Toolkit.getDefaultToolkit().getImage(imageURL));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
         add(populateLeftPanel());
         add(populateRightPanel());
         setVisible(true);
