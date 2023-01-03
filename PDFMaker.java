@@ -73,6 +73,7 @@ public class PDFMaker extends JDialog {
                         "order by \"Suma\";";
                 Statement statement = connection.createStatement();
                 ResultSet rs = statement.executeQuery(sql);
+
                 HashMap<String, Integer> resultPlus = new HashMap<>();
                 HashMap<String, Integer> resultMinus = new HashMap<>();
                 while (rs.next()) {
@@ -187,10 +188,16 @@ public class PDFMaker extends JDialog {
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd H-m");
                     LocalDateTime now = LocalDateTime.now();
                     String dateToday = dtf.format(now).toString();
-                    document.save(partPath+"\\ Godisnji izvestaj (" + godinaTf.getText() + ") " + dateToday + ".pdf");
+                    String documentPath = partPath+"\\ Godisnji izvestaj (" + godinaTf.getText() + ") " + dateToday + ".pdf";
+                    document.save(documentPath);
                     System.out.println("Doc saved");
                     document.close();
                     chart.delete();
+                    File docToOpen = new File(documentPath);
+                    if(Desktop.isDesktopSupported()){
+                        Desktop desktop = Desktop.getDesktop();
+                        desktop.open(docToOpen);
+                    }
                     this.dispose();
                 } catch (Exception e) {
                     if (chart != null)
@@ -223,7 +230,7 @@ public class PDFMaker extends JDialog {
         return outputImage;
     }
 
-    private int[] getMonthlyFlow(String year) { //don't know how to make iterative sql statement
+    private int[] getMonthlyFlow(String year) {
         int[] saldo = new int[12];
         for (int i = 0; i < 12; i++)
             saldo[i] = 0;
@@ -266,7 +273,6 @@ public class PDFMaker extends JDialog {
 
     public PDFMaker(JFrame parent) {
         super(parent, "Годишњи ПДФ", ModalityType.APPLICATION_MODAL);
-
         //default settings for gui
         setBounds((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2 - WINDOW_WIDTH / 2, (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT);
         populate();
