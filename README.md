@@ -209,6 +209,13 @@ If you are not fammiliar with adding JARs as external libraries in Java projects
 
 *Picture 3: Change money amount for particular transaction*
 
+## Legal Notes
+
+This app is open-source and should be treated that way. It is licensed under GNU General Public License v3.
+
+All Third-Party software used within this project is also open-source and is and will be respected acording to their licences available on websites previously provided through this README.md file. In order to understand everything, check their licences.
+
+For more informations related to the legal notes, check GPL license in this repository.
 # Future changes
 
 Here's the list of upcoming changes:
