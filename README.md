@@ -21,7 +21,7 @@ Users and Activities are unique by Name.
 
 ## How to use `v1.0`[^1]
 
-***This also applies to versions 1.1 and 1.2***
+***This also applies to versions 1.1, 1.2 and 2.0***
 
 The app is divided in 2 segments: Side bar and central panel.
 
@@ -35,10 +35,10 @@ The top bar, represented as menu, has 2 sections:
 - Data submenu
   - Change Actions names
   - Change Transactions money amount
-  - Generate yaerly statistics in PDF form
+  - Generate yearly statistics in PDF form
 - Help/About submenu
   - How to use the app. Redirects exactly here
-  - The shortest possible info about the app
+  - The shortest possible info about the app and the author
 
 The Central panel shows content of particular menu. Cash flow history shows tabular view of Transactions made in user-specified year and month, as well as the Balance at the end of that month.
 
@@ -161,10 +161,30 @@ For FlatLaf (third party LookAndFeel) add this dependecy:
   <version>2.6</version>
 </dependency>
 ```
+For Apache PDFBox
+```
+<dependency>
+  <groupId>org.apache.pdfbox</groupId>
+  <artifactId>pdfbox</artifactId>
+  <version>2.0.27</version>
+</dependency>
+```
+For JFree JFreeChart
+```
+<dependency>
+  <groupId>org.jfree</groupId>
+  <artifactId>jfreechart</artifactId>
+  <version>1.5.3</version>
+</dependency>
+```
 
 ***The section bellow is for those who don't use Apache Maven:***
 
 Unfortunately, PostgreSQL doesn't have built-in/default DriverManager for Java lang so it's necessary to download it separately from [here](https://jdbc.postgresql.org/download/)[^3].
+
+In order to get PDF function working, download Executable JARs:
+- [Apache PDFBox](https://pdfbox.apache.org/download.html)
+- [JFreeChart](https://github.com/jfree/jfreechart/releases/tag/v1.5.2)
 
 Additionally, you can download Third party LookAndFeel to make Java Swing more eye catching. I recommend using [FlatLaf](https://www.formdev.com/flatlaf/)
 
@@ -176,7 +196,7 @@ If you are not fammiliar with adding JARs as external libraries in Java projects
 - IntelliJ IDEA: [GeeksForGeeks](https://www.geeksforgeeks.org/how-to-add-external-jar-file-to-an-intellij-idea-project/)
 - Eclipse Java IDE: [WikiHow](https://www.wikihow.com/Add-JARs-to-Project-Build-Paths-in-Eclipse-(Java))
 
-## Photo (SRB edition)
+## Photos (SRB edition)
 ![Notes slika](https://user-images.githubusercontent.com/115867204/201484618-63c2df1d-17a4-4302-84fd-883be99cea49.png)
 
 *Picture 1: Add new revenue*
@@ -193,8 +213,10 @@ If you are not fammiliar with adding JARs as external libraries in Java projects
 
 Here's the list of upcoming changes:
 - English interface
-- Make history graph
-- PDF view of history with additional statistics
+- Refactor code
+- Open PDF immediately after creating it
+- Add logo to PDF
+- Insert threads for better performance
 
 [^1]: Version 1.0, 1.1 and 1.2 is in Serbian Cyrilic only.
 [^2]: Even though the newest version of Java is 19, it is recommended to use the LTS(Long time support) version, which is version 17
