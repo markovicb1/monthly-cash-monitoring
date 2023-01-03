@@ -221,7 +221,6 @@ For more informations related to the legal notes, check GPL license in this repo
 Here's the list of upcoming changes:
 - English interface
 - Refactor code
-- Open PDF immediately after creating it
 - Add logo to PDF
 - Insert threads for better performance
 
