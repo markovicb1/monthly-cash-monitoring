@@ -46,7 +46,7 @@ public class OAplikaciji extends JDialog {
         verzija.setFont(new Font("Times New Roman",Font.ITALIC,13));
         verzija.setBounds(WINDOW_WIDTH / 3 + 5,70,150,20);
 
-        JLabel datum = new JLabel("Производња           11.2022.");
+        JLabel datum = new JLabel("Производња           12.2022.");
         datum.setFont(new Font("Times New Roman",Font.ITALIC,13));
         datum.setBounds(WINDOW_WIDTH / 3 + 5,110,180,20);
 

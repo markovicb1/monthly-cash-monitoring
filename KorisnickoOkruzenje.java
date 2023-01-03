@@ -403,8 +403,16 @@ public class KorisnickoOkruzenje extends JFrame {
         prihodDanasBtn.addActionListener(al -> {
             LocalDate now = LocalDate.now();
             prihodGodina.setText(String.valueOf(now.getYear()));
-            prihodMesec.setText(String.valueOf(now.getMonthValue()));
-            prihodDan.setText(String.valueOf(now.getDayOfMonth()));
+            int month = now.getMonthValue();
+            int day = now.getDayOfMonth();
+            if(month > 9)
+                prihodMesec.setText(String.valueOf(month));
+            else
+                prihodMesec.setText("0" + month);
+            if(day > 9)
+                prihodDan.setText(String.valueOf(day));
+            else
+                prihodDan.setText("0" + day);
         });
 
         prihodUnesiBtn = new JButton("Унеси приход");
@@ -538,8 +546,16 @@ public class KorisnickoOkruzenje extends JFrame {
         rashodDanasBtn.addActionListener(al -> {
             LocalDate now = LocalDate.now();
             rashodGodina.setText(String.valueOf(now.getYear()));
-            rashodMesec.setText(String.valueOf(now.getMonthValue()));
-            rashodDan.setText(String.valueOf(now.getDayOfMonth()));
+            int month = now.getMonthValue();
+            int day = now.getDayOfMonth();
+            if(month > 9)
+                rashodMesec.setText(String.valueOf(month));
+            else
+                rashodMesec.setText("0" + month);
+            if(day > 9)
+                rashodDan.setText(String.valueOf(day));
+            else
+                rashodDan.setText("0" + day);
         });
 
         rashodUnesiBtn = new JButton("Унеси расход");
@@ -1080,7 +1096,7 @@ public class KorisnickoOkruzenje extends JFrame {
     }
 
     public KorisnickoOkruzenje() {
-        super("Нотес потрошње v2");
+        super("Нотес потрошње");
         //default settings for gui
         setBounds((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2 - WINDOW_WIDTH / 2, (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT);
         setResizable(false);
