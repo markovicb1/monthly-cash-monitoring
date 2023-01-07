@@ -1,5 +1,5 @@
-# monthly-cash-monitoring // `ENG` Monthly cash flow checker / `SRB` Нотес потрошње
-## ***Java Swing app for monthly and yearly monitoring of your personal cash flow - srb edition***
+# monthly-cash-monitoring // `ENG` Cash Flow Watcher / `SRB` Нотес потрошње
+## ***Java Swing app for monthly and yearly monitoring of your personal cash flow***
 
 ## Overview
 
@@ -7,13 +7,15 @@ This personal **dynamic GUI** app helps you track all your incomes and expenses 
 
 ## Development
 
-This Java Swing app works dynamically using PostgreSQL Database Management System. The core functionality is behind 3 connected tables inside the DB:
+This Java Swing app works dynamically using PostgreSQL Database Management System. The core functionality is behind 3(4) connected tables inside the DB:
 - User table
   - Defines different Users, since app tends to be used by many users on one PC
 - Activities table
   - Defines different Activities, divided in 2 groups: revenues and expenses (Types of Activities)
 - Transactions table
   - Defines different Transactions. Every User can make revenue or expense in some certain amount, on a specific date. This table is the main functionality of the DB
+- Language table
+  - Saves previous language mode
 
 Users and Activities are unique by Name.
 
@@ -21,7 +23,7 @@ Users and Activities are unique by Name.
 
 ## How to use `v1.0`[^1]
 
-***This also applies to versions 1.1, 1.2 and 2.0***
+***This applies to all new versions***
 
 The app is divided in 2 segments: Side bar and central panel.
 
@@ -37,6 +39,7 @@ The top bar, represented as menu, has 2 sections:
   - Change Transactions money amount
   - Generate yearly statistics in PDF form
 - Help/About submenu
+  - Change interface language (Serbian - English)
   - How to use the app. Redirects exactly here
   - The shortest possible info about the app and the author
 
@@ -44,7 +47,9 @@ The Central panel shows content of particular menu. Cash flow history shows tabu
 
 ## Download Executable JAR
 
-***As it is in the early phase of development (Local DB, no eng translation etc), the app is not yet available to be downloaded. However, you can make app operational in your IDE following the steps from the section bellow.***
+***If you are interested in using this simple app, you can find the most recent version in the Releases section of this repo.***
+
+***Be aware that this app works with local database, which means you have to install PostgreSQL DBMS and follow instructions dedicated to database configuration in order to use the app.***
 
 ## Prepare the app as a new project in IDE
 
@@ -107,7 +112,7 @@ TABLESPACE pg_default;
 ALTER TABLE IF EXISTS public."User"
 OWNER to postgres;
 ```
-9. Create the final Table 'Transactions'. Paste the code bellow in `SQL Shell`, and press enter.
+9. Create Table 'Transactions'. Paste the code bellow in `SQL Shell`, and press enter.
 ```sql
 CREATE TABLE IF NOT EXISTS public."Transactions"
 (
@@ -139,8 +144,23 @@ OWNER to postgres;
 INSERT INTO "User" (name)
 VALUES ('Admin');
 ```
-11. Finally, the DB is ready to use
+11. Create Table 'Language'. Paste the code bellow in `SQL Shell`, and press enter.
+```sql
+CREATE TABLE IF NOT EXISTS public."Language"
+(
+    id integer NOT NULL,
+    type integer,
+    CONSTRAINT "Language_pkey" PRIMARY KEY (id)
+)
 
+TABLESPACE pg_default;
+```
+  - Enter additional code and press enter:
+ ```sql
+ ALTER TABLE IF EXISTS public."Language"
+    OWNER to postgres;
+ ```
+ 
 ### Adding important external Libraries
 
 If you are familiar with the Apache Maven, you don't have to download anything but add dependencies to pom file:
@@ -219,7 +239,6 @@ For more informations related to the legal notes, check GPL license in this repo
 # Future changes
 
 Here's the list of upcoming changes:
-- English interface
 - Refactor code
 - Add logo to PDF
 - Insert threads for better performance
