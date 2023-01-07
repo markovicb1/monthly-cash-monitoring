@@ -14,6 +14,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.Vector;
 
 public class KorisnickoOkruzenje extends JFrame {
@@ -48,6 +50,7 @@ public class KorisnickoOkruzenje extends JFrame {
     private JMenuItem izmeniAktivnost;
     private JMenuItem izmeniTransakciju;
     private JMenuItem generisiPDF;
+    private JMenuItem jezik;
     private JMenuItem kakoKoristiti;
     private JMenuItem oAplikaciji;
 
@@ -121,6 +124,10 @@ public class KorisnickoOkruzenje extends JFrame {
     private JButton izmeniTransakcijuUpisiBtn;
     private JScrollPane izmeniTransakcijuScroll;
     private int[] idTransakcija;
+
+    public static int language = 1;
+
+    public ResourceBundle langSet;
 
     private void showSidePanel() {
         side = new JPanel(null);
@@ -255,28 +262,28 @@ public class KorisnickoOkruzenje extends JFrame {
         side.setBounds(0, 0, WINDOW_WIDTH / 4, WINDOW_HEIGHT);
         side.setBackground(new Color(96, 63, 131));
 
-        noviPrihod = new JButton("Нови приход");
+        noviPrihod = new JButton(langSet.getString("NewIncome"));
         noviPrihod.setBounds(WINDOW_WIDTH / 8 - 65, 60, 130, 30);
         noviPrihod.addActionListener(al -> {
             cardLayout.show(container, PRIHOD_FLAG);
             showSidePanel();
         });
 
-        noviRashod = new JButton("Нови расход");
+        noviRashod = new JButton(langSet.getString("NewExpense"));
         noviRashod.setBounds(WINDOW_WIDTH / 8 - 65, 110, 130, 30);
         noviRashod.addActionListener(al -> {
             cardLayout.show(container, RASHOD_FLAG);
             showSidePanel();
         });
 
-        dodajAktivnost = new JButton("Додај активност");
+        dodajAktivnost = new JButton(langSet.getString("AddActivity"));
         dodajAktivnost.setBounds(WINDOW_WIDTH / 8 - 65, 160, 130, 30);
         dodajAktivnost.addActionListener(al -> {
             cardLayout.show(container, AKTIVNOST_FLAG);
             showSidePanel();
         });
 
-        vidiIstoriju = new JButton("Историја");
+        vidiIstoriju = new JButton(langSet.getString("FlowHistory"));
         vidiIstoriju.setBounds(WINDOW_WIDTH / 8 - 65, 210, 130, 30);
         vidiIstoriju.addActionListener(al -> {
             cardLayout.show(container, ISTORIJA_FLAG);
@@ -291,27 +298,42 @@ public class KorisnickoOkruzenje extends JFrame {
 
     private void configureMenus() {
         menuBar = new JMenuBar();
-        podaci = new JMenu("Подаци");
+        podaci = new JMenu(langSet.getString("Data"));
         podaci.setMnemonic(KeyEvent.VK_P);
-        izmeniAktivnost = new JMenuItem("Измени постојећу активност");
+        izmeniAktivnost = new JMenuItem(langSet.getString("RenameActivity"));
         izmeniAktivnost.addActionListener(al -> {
             cardLayout.show(container, IZMENI_FLAG);
             showSidePanel();
         });
-        izmeniTransakciju = new JMenuItem("Измени извршену трансакцију");
+        izmeniTransakciju = new JMenuItem(langSet.getString("ChangeTransaction"));
         izmeniTransakciju.addActionListener(al -> {
             cardLayout.show(container, IZMENI_TRANS_FLAG);
             showSidePanel();
         });
-        generisiPDF = new JMenuItem("Генериши годишњи ПДФ");
+        generisiPDF = new JMenuItem(langSet.getString("GeneratePDF"));
         generisiPDF.addActionListener(al -> {
             PDFMaker maker = new PDFMaker(this);
         });
         podaci.add(izmeniAktivnost);
         podaci.add(izmeniTransakciju);
         podaci.add(generisiPDF);
-        pomoc = new JMenu("Помоћ");
-        kakoKoristiti = new JMenuItem("Како користити апликацију");
+        pomoc = new JMenu(langSet.getString("Help"));
+        jezik = new JMenuItem(langSet.getString("Lang"));
+        jezik.addActionListener(al->{
+            if(language == 1){
+                language = 2;
+                langSet = ResourceBundle.getBundle("Languages",new Locale("sr","RS"));
+                setInterfaceLanguage(language);
+            }
+            else{
+                language = 1;
+                langSet = ResourceBundle.getBundle("Languages",new Locale("en","US"));
+                setInterfaceLanguage(language);
+            }
+            this.dispose();
+            new KorisnickoOkruzenje(langSet);
+        });
+        kakoKoristiti = new JMenuItem(langSet.getString("HowToUse"));
         kakoKoristiti.addActionListener(al -> {
             //open site on browser
             Desktop desktop = Desktop.getDesktop();
@@ -323,24 +345,40 @@ public class KorisnickoOkruzenje extends JFrame {
                 JOptionPane.showMessageDialog(null, "Can't reach site.");
             }
         });
-        oAplikaciji = new JMenuItem("О апликацији");
+        oAplikaciji = new JMenuItem(langSet.getString("About"));
         oAplikaciji.addActionListener(al -> {
             new OAplikaciji(this);
         });
+        pomoc.add(jezik);
         pomoc.add(kakoKoristiti);
         pomoc.add(oAplikaciji);
         menuBar.add(podaci);
         menuBar.add(pomoc);
     }
 
+    private void setInterfaceLanguage(int language) {
+        try {
+            Connection connection = DriverManager.getConnection(dbURL,dbUsername,dbPassword);
+            String sql = "UPDATE \"Language\"\n" +
+                    "SET type = " + language + "\n" +
+                    "WHERE id = 1;";
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(sql);
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,e.getMessage());
+        }
+    }
+
     private void populatePrihodPanel() {
         prihod = new JPanel(null);
         prihod.setBackground(new Color(199, 211, 212));
-        prihodNaslov = new JLabel("Нови приход");
+        prihodNaslov = new JLabel(langSet.getString("NewIncome"));
         prihodNaslov.setFont(new Font("Times New Roman", Font.BOLD, 16));
         prihodNaslov.setBounds(5 * WINDOW_WIDTH / 8 - 50, 10, 100, 20);
 
-        prihodTip = new JLabel("Тип прихода");
+        prihodTip = new JLabel(langSet.getString("IncomeType"));
         prihodTip.setFont(new Font("Times New Roman", Font.BOLD, 14));
         prihodTip.setBounds(WINDOW_WIDTH / 4 + 15, 70, 80, 20);
 
@@ -377,7 +415,7 @@ public class KorisnickoOkruzenje extends JFrame {
         prihodCB.setFont(new Font("Times New Roman", Font.ITALIC, 13));
         prihodCB.setBounds(5 * WINDOW_WIDTH / 8 - 75, 70, 150, 20);
 
-        prihodKolicina = new JLabel("Количина новца");
+        prihodKolicina = new JLabel(langSet.getString("MoneyAmount"));
         prihodKolicina.setFont(new Font("Times New Roman", Font.BOLD, 14));
         prihodKolicina.setBounds(WINDOW_WIDTH / 4 + 15, 120, 110, 20);
 
@@ -385,7 +423,7 @@ public class KorisnickoOkruzenje extends JFrame {
         prihodKolicinaNovcaTf.setBounds(5 * WINDOW_WIDTH / 8 - 75, 120, 50, 20); //do 6 cifara
         prihodKolicinaNovcaTf.setHorizontalAlignment(0);
 
-        prihodDatumLb = new JLabel("Датум: YYYY-MM-DD");
+        prihodDatumLb = new JLabel(langSet.getString("FullDate"));
         prihodDatumLb.setFont(new Font("Times New Roman", Font.BOLD, 14));
         prihodDatumLb.setBounds(WINDOW_WIDTH / 4 + 15, 170, 145, 20);
 
@@ -398,7 +436,7 @@ public class KorisnickoOkruzenje extends JFrame {
         prihodDan = new JTextField();
         prihodDan.setBounds(5 * WINDOW_WIDTH / 8 - 75 + 50 + 50, 170, 50, 20);
         prihodDan.setHorizontalAlignment(0);
-        prihodDanasBtn = new JButton("Данашњи датум");
+        prihodDanasBtn = new JButton(langSet.getString("Today"));
         prihodDanasBtn.setBounds(3 * WINDOW_WIDTH / 4, 170, 130, 20);
         prihodDanasBtn.addActionListener(al -> {
             LocalDate now = LocalDate.now();
@@ -415,7 +453,7 @@ public class KorisnickoOkruzenje extends JFrame {
                 prihodDan.setText("0" + day);
         });
 
-        prihodUnesiBtn = new JButton("Унеси приход");
+        prihodUnesiBtn = new JButton(langSet.getString("InsertIncome"));
         prihodUnesiBtn.setBounds(WINDOW_WIDTH / 4 + 15, WINDOW_HEIGHT - 80, 120, 20);
         prihodUnesiBtn.addActionListener(al -> {
             try {
@@ -459,7 +497,7 @@ public class KorisnickoOkruzenje extends JFrame {
                     JOptionPane.showMessageDialog(null, e.getMessage());
                 }
             } catch (GreskaPraznaPolja e) {
-                JOptionPane.showMessageDialog(null, "Унети све вредности!");
+                JOptionPane.showMessageDialog(null, e.getMessage());
             }
         });
 
@@ -479,11 +517,11 @@ public class KorisnickoOkruzenje extends JFrame {
     private void populateRashodPanel() {
         rashod = new JPanel(null);
         rashod.setBackground(new Color(199, 211, 212));
-        rashodNaslov = new JLabel("Нови расход");
+        rashodNaslov = new JLabel(langSet.getString("NewExpense"));
         rashodNaslov.setFont(new Font("Times New Roman", Font.BOLD, 16));
         rashodNaslov.setBounds(5 * WINDOW_WIDTH / 8 - 50, 10, 100, 20);
 
-        rashodTip = new JLabel("Тип расхода");
+        rashodTip = new JLabel(langSet.getString("ExpenseType"));
         rashodTip.setFont(new Font("Times New Roman", Font.BOLD, 14));
         rashodTip.setBounds(WINDOW_WIDTH / 4 + 15, 70, 80, 20);
 
@@ -520,7 +558,7 @@ public class KorisnickoOkruzenje extends JFrame {
         rashodCB.setFont(new Font("Times New Roman", Font.ITALIC, 13));
         rashodCB.setBounds(5 * WINDOW_WIDTH / 8 - 75, 70, 150, 20);
 
-        rashodKolicina = new JLabel("Количина новца");
+        rashodKolicina = new JLabel(langSet.getString("MoneyAmount"));
         rashodKolicina.setFont(new Font("Times New Roman", Font.BOLD, 14));
         rashodKolicina.setBounds(WINDOW_WIDTH / 4 + 15, 120, 110, 20);
 
@@ -528,7 +566,7 @@ public class KorisnickoOkruzenje extends JFrame {
         rashodKolicinaNovcaTf.setBounds(5 * WINDOW_WIDTH / 8 - 75, 120, 50, 20); //do 6 cifara
         rashodKolicinaNovcaTf.setHorizontalAlignment(0);
 
-        rashodDatumLb = new JLabel("Датум: YYYY-MM-DD");
+        rashodDatumLb = new JLabel(langSet.getString("FullDate"));
         rashodDatumLb.setFont(new Font("Times New Roman", Font.BOLD, 14));
         rashodDatumLb.setBounds(WINDOW_WIDTH / 4 + 15, 170, 145, 20);
 
@@ -541,7 +579,7 @@ public class KorisnickoOkruzenje extends JFrame {
         rashodDan = new JTextField();
         rashodDan.setBounds(5 * WINDOW_WIDTH / 8 - 75 + 50 + 50, 170, 50, 20);
         rashodDan.setHorizontalAlignment(0);
-        rashodDanasBtn = new JButton("Данашњи датум");
+        rashodDanasBtn = new JButton(langSet.getString("Today"));
         rashodDanasBtn.setBounds(3 * WINDOW_WIDTH / 4, 170, 130, 20);
         rashodDanasBtn.addActionListener(al -> {
             LocalDate now = LocalDate.now();
@@ -558,7 +596,7 @@ public class KorisnickoOkruzenje extends JFrame {
                 rashodDan.setText("0" + day);
         });
 
-        rashodUnesiBtn = new JButton("Унеси расход");
+        rashodUnesiBtn = new JButton(langSet.getString("InsertExpense"));
         rashodUnesiBtn.setBounds(WINDOW_WIDTH / 4 + 15, WINDOW_HEIGHT - 80, 120, 20);
         rashodUnesiBtn.addActionListener(al -> {
             try {
@@ -603,7 +641,7 @@ public class KorisnickoOkruzenje extends JFrame {
                     JOptionPane.showMessageDialog(null, e.getMessage());
                 }
             } catch (GreskaPraznaPolja e) {
-                JOptionPane.showMessageDialog(null, "Унети сва поља!");
+                JOptionPane.showMessageDialog(null, e.getMessage());
             }
         });
 
@@ -624,11 +662,11 @@ public class KorisnickoOkruzenje extends JFrame {
         aktivnost = new JPanel(null);
         aktivnost.setBackground(new Color(199, 211, 212));
 
-        aktivnostNaslov = new JLabel("Нова активност");
+        aktivnostNaslov = new JLabel(langSet.getString("AddActivity"));
         aktivnostNaslov.setFont(new Font("Times New Roman", Font.BOLD, 16));
         aktivnostNaslov.setBounds(5 * WINDOW_WIDTH / 8 - 60, 10, 120, 20);
 
-        aktivnostIme = new JLabel("Име активности");
+        aktivnostIme = new JLabel(langSet.getString("ActivityName"));
         aktivnostIme.setFont(new Font("Times New Roman", Font.BOLD, 14));
         aktivnostIme.setBounds(WINDOW_WIDTH / 4 + 15, 110, 110, 20);
 
@@ -636,19 +674,19 @@ public class KorisnickoOkruzenje extends JFrame {
         aktivnostImeTf.setBounds(5 * WINDOW_WIDTH / 8 - 85, 110, 150, 20);
         aktivnostImeTf.setHorizontalAlignment(JTextField.CENTER);
 
-        aktivnostTip = new JLabel("Тип активности");
+        aktivnostTip = new JLabel(langSet.getString("ActivityType"));
         aktivnostTip.setFont(new Font("Times New Roman", Font.BOLD, 14));
         aktivnostTip.setBounds(WINDOW_WIDTH / 4 + 15, 160, 120, 20);
 
-        aktivnostTipPrihod = new JRadioButton("Приход");
+        aktivnostTipPrihod = new JRadioButton(langSet.getString("Income"));
         aktivnostTipPrihod.setBounds(5 * WINDOW_WIDTH / 8 - 85, 160, 70, 20);
-        aktivnostTipRashod = new JRadioButton("Расход");
+        aktivnostTipRashod = new JRadioButton(langSet.getString("Expense"));
         aktivnostTipRashod.setBounds(5 * WINDOW_WIDTH / 8 - 85 + 85, 160, 70, 20);
         aktivnostRBGrupa = new ButtonGroup();
         aktivnostRBGrupa.add(aktivnostTipPrihod);
         aktivnostRBGrupa.add(aktivnostTipRashod);
 
-        aktivnostUnesi = new JButton("Унеси активност");
+        aktivnostUnesi = new JButton(langSet.getString("InsertActivity"));
         aktivnostUnesi.setBounds(WINDOW_WIDTH / 4 + 15, WINDOW_HEIGHT - 80, 140, 20);
         aktivnostUnesi.addActionListener(al -> {
             try {
@@ -676,7 +714,7 @@ public class KorisnickoOkruzenje extends JFrame {
                     izmeniAktivnostCB.addItem(s);
                 aktivnostImeTf.setText("");
             } catch (GreskaPraznaPolja e) {
-                JOptionPane.showMessageDialog(null, "Унети сва поља!");
+                JOptionPane.showMessageDialog(null, e.getMessage());
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, e.getMessage());
             }
@@ -740,7 +778,7 @@ public class KorisnickoOkruzenje extends JFrame {
                 while (resultSet.next()) {
                     amount = resultSet.getInt(1);
                 }
-                istorijaSaldoTf.setText(String.valueOf(amount) + "дин");
+                istorijaSaldoTf.setText(String.valueOf(amount));
                 resultSet.close();
                 statement.close();
                 connection.close();
@@ -748,7 +786,7 @@ public class KorisnickoOkruzenje extends JFrame {
                 JOptionPane.showMessageDialog(null, e.getMessage());
             }
         } catch (GreskaPraznaPolja e) {
-            JOptionPane.showMessageDialog(null, "Унети сва поља!");
+            JOptionPane.showMessageDialog(null, e.getMessage());
         }
     }
 
@@ -756,11 +794,11 @@ public class KorisnickoOkruzenje extends JFrame {
         istorija = new JPanel(null);
         istorija.setBackground(new Color(199, 211, 212));
 
-        istorijaNaslov = new JLabel("Историја трансакција");
+        istorijaNaslov = new JLabel(langSet.getString("TransactionsHistory"));
         istorijaNaslov.setFont(new Font("Times New Roman", Font.BOLD, 16));
         istorijaNaslov.setBounds(5 * WINDOW_WIDTH / 8 - 80, 10, 160, 20);
 
-        istorijaDatum = new JLabel("Датум YYYY-MM");
+        istorijaDatum = new JLabel(langSet.getString("PartDate"));
         istorijaDatum.setFont(new Font("Times New Roman", Font.BOLD, 14));
         istorijaDatum.setBounds(WINDOW_WIDTH / 4 + 15, 40, 120, 20);
 
@@ -772,27 +810,27 @@ public class KorisnickoOkruzenje extends JFrame {
         istorijaDatumMesec.setBounds(WINDOW_WIDTH / 4 + 15 + 125 + 108, 40, 50, 20);
         istorijaDatumMesec.setHorizontalAlignment(0);
 
-        istorijaGenerisi = new JButton("Генериши");
+        istorijaGenerisi = new JButton(langSet.getString("Generate"));
         istorijaGenerisi.setBounds(WINDOW_WIDTH - 120, 40, 90, 20);
 
         istorijaTabela = new JTable();
         istorijaTabela.setBounds(WINDOW_WIDTH / 4 + 15, 75, 3 * WINDOW_WIDTH / 4 - 45, 160);
         defaultTableModel = new DefaultTableModel(0, 0);
-        String[] header = {"Активност", "Количина новца", "Датум"};
+        String[] header = {langSet.getString("Activity"), langSet.getString("MoneyAmount"), langSet.getString("Date")};
         defaultTableModel.setColumnIdentifiers(header);
         istorijaTabela.setModel(defaultTableModel);
         istorijaScroll = new JScrollPane(istorijaTabela);
         istorijaScroll.setBounds(WINDOW_WIDTH / 4 + 15, 75, 3 * WINDOW_WIDTH / 4 - 45, 160);
 
-        istorijaSaldo = new JLabel("Салдо за унети месец");
+        istorijaSaldo = new JLabel(langSet.getString("Balance"));
         istorijaSaldo.setBounds(WINDOW_WIDTH / 4 + 15, 255, 150, 20);
 
         istorijaSaldoTf = new JTextField();
-        istorijaSaldoTf.setBounds(WINDOW_WIDTH / 4 + 15 + 150, 255, 80, 20);
+        istorijaSaldoTf.setBounds(WINDOW_WIDTH / 4 + 20 + 150, 255, 80, 20);
         istorijaSaldoTf.setEditable(false);
         istorijaSaldoTf.setHorizontalAlignment(0);
 
-        istorijaObrisi = new JButton("Обриши");
+        istorijaObrisi = new JButton(langSet.getString("Clear"));
         istorijaObrisi.setBounds(WINDOW_WIDTH - 120, 255, 90, 20);
         istorijaObrisi.addActionListener(al -> {
             istorijaDatumMesec.setText("");
@@ -833,11 +871,11 @@ public class KorisnickoOkruzenje extends JFrame {
         izmeniAktivnostCard = new JPanel(null);
         izmeniAktivnostCard.setBackground(new Color(199, 211, 212));
 
-        izmeniАktivnostNaslov = new JLabel("Измени активност");
+        izmeniАktivnostNaslov = new JLabel(langSet.getString("RenameActivity"));
         izmeniАktivnostNaslov.setFont(new Font("Times New Roman", Font.BOLD, 16));
-        izmeniАktivnostNaslov.setBounds(5 * WINDOW_WIDTH / 8 - 60, 10, 150, 20);
+        izmeniАktivnostNaslov.setBounds(5 * WINDOW_WIDTH / 8 - 70, 10, 140, 20);
 
-        izmeniAktivnostIzaberi = new JLabel("Изабери активност");
+        izmeniAktivnostIzaberi = new JLabel(langSet.getString("ChooseActivity"));
         izmeniAktivnostIzaberi.setFont(new Font("Times New Roman", Font.BOLD, 14));
         izmeniAktivnostIzaberi.setBounds(WINDOW_WIDTH / 4 + 15, 110, 150, 20);
 
@@ -873,7 +911,7 @@ public class KorisnickoOkruzenje extends JFrame {
         izmeniAktivnostCB.setFont(new Font("Times New Roman", Font.ITALIC, 13));
         izmeniAktivnostCB.setBounds(WINDOW_WIDTH / 4 + 15 + 160, 110, 110, 20);
 
-        izmeniAktivnostNovoIme = new JLabel("Ново име активности");
+        izmeniAktivnostNovoIme = new JLabel(langSet.getString("ActivityNewName"));
         izmeniAktivnostNovoIme.setFont(new Font("Times New Roman", Font.BOLD, 14));
         izmeniAktivnostNovoIme.setBounds(WINDOW_WIDTH / 4 + 15, 150, 150, 20);
 
@@ -881,7 +919,7 @@ public class KorisnickoOkruzenje extends JFrame {
         izmeniAktivnostNovoImeTf.setBounds(WINDOW_WIDTH / 4 + 15 + 160, 150, 110, 20);
         izmeniAktivnostNovoImeTf.setHorizontalAlignment(0);
 
-        izmeniAktivnostBtn = new JButton("Ажурирај");
+        izmeniAktivnostBtn = new JButton(langSet.getString("Update"));
         izmeniAktivnostBtn.setBounds(WINDOW_WIDTH / 4 + 15, WINDOW_HEIGHT - 80, 120, 20);
         String[] finalData = data;
         izmeniAktivnostBtn.addActionListener(al -> {
@@ -939,11 +977,11 @@ public class KorisnickoOkruzenje extends JFrame {
         izmeniTransakcijuCard = new JPanel(null);
         izmeniTransakcijuCard.setBackground(new Color(199, 211, 212));
 
-        izmeniTransakcijuNaslov = new JLabel("Промените количину новца за трансакцију");
+        izmeniTransakcijuNaslov = new JLabel(langSet.getString("TransactionNewAmount"));
         izmeniTransakcijuNaslov.setFont(new Font("Times New Roman", Font.BOLD, 16));
         izmeniTransakcijuNaslov.setBounds(5 * WINDOW_WIDTH / 8 - 175, 10, 350, 20);
 
-        izmeniTransakcijuDatumLb = new JLabel("Унети датум YYYY-MM + DD за тачност");
+        izmeniTransakcijuDatumLb = new JLabel(langSet.getString("TransactionDate"));
         izmeniTransakcijuDatumLb.setBounds(WINDOW_WIDTH / 4 + 7, 83, 280, 10);
         izmeniTransakcijuDatumLb.setFont(new Font("Times New Roman", Font.BOLD, 14));
         izmeniTransakcijuGodinaTf = new JTextField();
@@ -958,7 +996,7 @@ public class KorisnickoOkruzenje extends JFrame {
 
         listModel = new DefaultListModel<String>();
 
-        izmeniTransakcijuGenerisiTransakcijeBtn = new JButton("Прикажи");
+        izmeniTransakcijuGenerisiTransakcijeBtn = new JButton(langSet.getString("Generate"));
         izmeniTransakcijuGenerisiTransakcijeBtn.setBounds(WINDOW_WIDTH - 120, 110, 90, 20);
         izmeniTransakcijuGenerisiTransakcijeBtn.addActionListener(al -> {
             if (listModel.getSize() > 0)
@@ -1003,7 +1041,7 @@ public class KorisnickoOkruzenje extends JFrame {
                 }
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sql);
-                int cnt = 0; //limit to max 6 results displayed
+                int cnt = 0; //limit to max 6 results displayed, I guess there's a better way to do this
                 idTransakcija = new int[7];
                 while (resultSet.next()) {
                     cnt++;
@@ -1014,19 +1052,20 @@ public class KorisnickoOkruzenje extends JFrame {
                     sb.append(resultSet.getString(2));
                     sb.append(" ");
                     sb.append(resultSet.getString(3));
-                    sb.append("дин ");
+                    sb.append(" ");
                     sb.append(resultSet.getString(4));
                     listModel.addElement(sb.toString());
                 }
                 resultSet.close();
                 statement.close();
+                connection.close();
                 if (listModel.getSize() == 0)
-                    JOptionPane.showMessageDialog(null, "Нема резултата претраге.");
+                    JOptionPane.showMessageDialog(null, langSet.getString("NoSearchResults"));
                 izmeniTransakcijuLista.setModel(listModel);
             } catch (SQLException se) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR: " + se.getMessage());
             } catch (GreskaPraznaPolja e) {
-                JOptionPane.showMessageDialog(null, "Унети сва поља.");
+                JOptionPane.showMessageDialog(null, e.getMessage());
             }
         });
 
@@ -1037,21 +1076,21 @@ public class KorisnickoOkruzenje extends JFrame {
         izmeniTransakcijuScroll = new JScrollPane(izmeniTransakcijuLista);
         izmeniTransakcijuScroll.setBounds(WINDOW_WIDTH / 4 + 25, 130, 225, 110);
 
-        izmeniTransakcijuNovacLb = new JLabel("Нова количина новца");
+        izmeniTransakcijuNovacLb = new JLabel(langSet.getString("NewMoneyAmount"));
         izmeniTransakcijuNovacLb.setFont(new Font("Times New Roman", Font.BOLD, 14));
         izmeniTransakcijuNovacLb.setBounds(WINDOW_WIDTH - 170, 130 + 50, 150, 10); //WINDOW_WIDTH / 4 + izmeniTransakcijuDatumLb.getWidth()
         izmeniTransakcijuNovacTf = new JTextField();
         izmeniTransakcijuNovacTf.setBounds(WINDOW_WIDTH - 80, 205, 50, 20);
         izmeniTransakcijuNovacTf.setHorizontalAlignment(0);
 
-        izmeniTransakcijuUpisiBtn = new JButton("Промени");
+        izmeniTransakcijuUpisiBtn = new JButton(langSet.getString("Change"));
         izmeniTransakcijuUpisiBtn.setBounds(WINDOW_WIDTH - 120, 255, 90, 20);
         izmeniTransakcijuUpisiBtn.addActionListener(al -> {
             int selected = izmeniTransakcijuLista.getSelectedIndex();
             if (selected == -1)
-                JOptionPane.showMessageDialog(null, "Изабрати трансакцију која се мења.");
+                JOptionPane.showMessageDialog(null, langSet.getString("ChooseTransaction"));
             if (izmeniTransakcijuNovacTf.getText().isBlank())
-                JOptionPane.showMessageDialog(null, "Унети нову количину новца.");
+                JOptionPane.showMessageDialog(null, langSet.getString("NewMoneyAmount"));
             try {
                 String uzorak = (String) izmeniTransakcijuLista.getSelectedValue();
                 String[] delovi = uzorak.split(" ");
@@ -1095,8 +1134,9 @@ public class KorisnickoOkruzenje extends JFrame {
         izmeniTransakcijuCard.add(izmeniTransakcijuUpisiBtn);
     }
 
-    public KorisnickoOkruzenje() {
-        super("Нотес потрошње");
+    public KorisnickoOkruzenje(ResourceBundle langSet) {
+        this.langSet = langSet;
+        this.setTitle(langSet.getString("Title"));
         //default settings for gui
         setBounds((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2 - WINDOW_WIDTH / 2, (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT);
         setResizable(false);

@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.ResourceBundle;
 
 public class PDFMaker extends JDialog {
     public static final int WINDOW_WIDTH = 320;
@@ -47,17 +48,19 @@ public class PDFMaker extends JDialog {
 
     private File chart = null;
 
+    private ResourceBundle langSet;
+
     private void populate() {
         panel = new JPanel(null);
 
-        godina = new JLabel("Година");
+        godina = new JLabel(langSet.getString("Year"));
         godina.setBounds(50, 30, 80, 10);
 
         godinaTf = new JTextField();
         godinaTf.setHorizontalAlignment(0);
         godinaTf.setBounds(50, 50, 40, 20);
 
-        generisi = new JButton("Генериши ПДФ");
+        generisi = new JButton(langSet.getString("Generate"));
         generisi.setBounds(140, 50, 120, 20);
         generisi.addActionListener(al -> {
             String startDate = "DATE'" + godinaTf.getText() + "-01-01'";
@@ -97,10 +100,9 @@ public class PDFMaker extends JDialog {
                     fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     int userSelection = fileChooser.showSaveDialog(this);
                     File saveLocation = null;
-                    if(userSelection == JFileChooser.APPROVE_OPTION){
+                    if (userSelection == JFileChooser.APPROVE_OPTION) {
                         saveLocation = fileChooser.getSelectedFile();
-                    }
-                    else{
+                    } else {
                         throw new Exception("Choose save destination!");
                     }
                     partPath = saveLocation.getPath();
@@ -108,7 +110,7 @@ public class PDFMaker extends JDialog {
                     PDPageContentStream contentStream = new PDPageContentStream(document, page1);
                     //title
                     contentStream.beginText();
-                    String title = "Finansijksi izveštaj za " + godinaTf.getText() + ". godinu";
+                    String title = langSet.getString("Report") + godinaTf.getText() + langSet.getString("ReportYear");
                     contentStream.setFont(font, 20);
                     float titleWidth = font.getStringWidth(title) / 1000 * 20;
                     float titleHeight = font.getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * 20;
@@ -123,14 +125,14 @@ public class PDFMaker extends JDialog {
                     contentStream.newLineAtOffset(50, offset);
                     contentStream.setFont(font, 16);
                     int sum = getSum(resultPlus);
-                    contentStream.showText("Ukupni prihodi: " + sum + "din");
+                    contentStream.showText(langSet.getString("TotalIncome") + sum);
                     contentStream.endText();
                     //prihodi list
                     font = PDType1Font.TIMES_ROMAN;
                     offset -= 30;
                     for (String key : resultPlus.keySet()) {
                         int money = resultPlus.get(key);
-                        String text = "    - " + key + ": " + money + "din";
+                        String text = "    - " + key + ": " + money;
                         appendToList(contentStream, font, offset, text);
                         offset -= 15;
                     }
@@ -141,14 +143,14 @@ public class PDFMaker extends JDialog {
                     contentStream.newLineAtOffset(50, offset);
                     contentStream.setFont(font, 16);
                     int sumMinus = getSum(resultMinus);
-                    contentStream.showText("Ukupni rashodi: " + sumMinus + "din");
+                    contentStream.showText(langSet.getString("TotalExpenses") + sumMinus);
                     contentStream.endText();
                     //rashodi list
                     font = PDType1Font.TIMES_ROMAN;
                     offset -= 30;
                     for (String key : resultMinus.keySet()) {
                         int money = resultMinus.get(key);
-                        String text = "    - " + key + ": " + money + "din";
+                        String text = "    - " + key + ": " + money;
                         appendToList(contentStream, font, offset, text);
                         offset -= 15;
                     }
@@ -159,11 +161,11 @@ public class PDFMaker extends JDialog {
                     contentStream.newLineAtOffset(50, offset);
                     contentStream.setFont(font, 16);
                     int saldo = sum + sumMinus;
-                    contentStream.showText("Godišnji saldo: " + saldo + "din");
+                    contentStream.showText(langSet.getString("AnnualBalance") + saldo);
                     contentStream.endText();
                     //grafik title
                     contentStream.beginText();
-                    String graphTitle = "Grafik promene salda tokom godine";
+                    String graphTitle = langSet.getString("Graph");
                     float titleGWidth = font.getStringWidth(graphTitle) / 1000 * 18;
                     font = PDType1Font.TIMES_BOLD_ITALIC;
                     offset -= 50;
@@ -177,7 +179,7 @@ public class PDFMaker extends JDialog {
                     chart = getChart(mesecniSaldo);
                     PDImageXObject pdImageXObject = PDImageXObject.createFromFile(chart.getPath(), document);
                     Float height = page1.getMediaBox().getHeight();
-                    contentStream.drawImage(pdImageXObject, (page1.getMediaBox().getWidth() - 426) / 2,(height - offset - 240)/2);
+                    contentStream.drawImage(pdImageXObject, (page1.getMediaBox().getWidth() - 426) / 2, (height - offset - 240) / 2);
                     //label Circled B,doesn't work from JAR file
 //                    URL labelPDF = getClass().getClassLoader().getResource("labelPDF.jpg");
 //                    String filePath = labelPDF.getFile().substring(6,labelPDF.getFile().length());
@@ -188,13 +190,13 @@ public class PDFMaker extends JDialog {
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd H-m");
                     LocalDateTime now = LocalDateTime.now();
                     String dateToday = dtf.format(now).toString();
-                    String documentPath = partPath+"\\ Godisnji izvestaj (" + godinaTf.getText() + ") " + dateToday + ".pdf";
+                    String documentPath = partPath + "\\ Report (" + godinaTf.getText() + ") " + dateToday + ".pdf";
                     document.save(documentPath);
                     System.out.println("Doc saved");
                     document.close();
                     chart.delete();
                     File docToOpen = new File(documentPath);
-                    if(Desktop.isDesktopSupported()){
+                    if (Desktop.isDesktopSupported()) {
                         Desktop desktop = Desktop.getDesktop();
                         desktop.open(docToOpen);
                     }
@@ -220,11 +222,11 @@ public class PDFMaker extends JDialog {
     private File getChart(int[] mesecniSaldo) throws IOException {
         DefaultCategoryDataset lineChartSet = new DefaultCategoryDataset();
         for (int i = 0; i < 12; i++)
-            lineChartSet.addValue(mesecniSaldo[i], "Saldo", String.valueOf(i + 1));
-        JFreeChart chartObject = ChartFactory.createLineChart("", "Mesec", "Saldo", lineChartSet, PlotOrientation.VERTICAL, false, false, false);
+            lineChartSet.addValue(mesecniSaldo[i], langSet.getString("BalancePDF"), String.valueOf(i + 1));
+        JFreeChart chartObject = ChartFactory.createLineChart("", langSet.getString("Month"), langSet.getString("BalancePDF"), lineChartSet, PlotOrientation.VERTICAL, false, false, false);
         int width = 426;
         int height = 240;
-        chartObject.setBackgroundPaint(new Color(242,242,242));
+        chartObject.setBackgroundPaint(new Color(242, 242, 242));
         File outputImage = new File(partPath + "\\chartTemporary.jpeg");
         ChartUtils.saveChartAsJPEG(outputImage, chartObject, width, height);
         return outputImage;
@@ -271,8 +273,11 @@ public class PDFMaker extends JDialog {
         return sum;
     }
 
-    public PDFMaker(JFrame parent) {
-        super(parent, "Годишњи ПДФ", ModalityType.APPLICATION_MODAL);
+    public PDFMaker(KorisnickoOkruzenje parent) {
+        //super(parent, "Годишњи ПДФ", ModalityType.APPLICATION_MODAL);
+        this.langSet = parent.langSet;
+        setTitle(langSet.getString("PDFLabelName"));
+        setModalityType(ModalityType.APPLICATION_MODAL);
         //default settings for gui
         setBounds((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2 - WINDOW_WIDTH / 2, (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT);
         populate();

@@ -8,12 +8,15 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ResourceBundle;
 
 public class OAplikaciji extends JDialog {
     public static final int WINDOW_WIDTH = 400;
     public static final int WINDOW_HEIGHT = 300;
     private JPanel left;
     private JPanel right;
+
+    private ResourceBundle langSet;
 
     private JPanel populateLeftPanel() {
         left = new JPanel(null);
@@ -38,19 +41,19 @@ public class OAplikaciji extends JDialog {
         right.setBounds(WINDOW_WIDTH / 3, 0, 2*WINDOW_WIDTH / 3, WINDOW_HEIGHT);
         right.setBackground(new Color(199, 211, 212));
 
-        JLabel naslov = new JLabel("Нотес потрошње - пратите своје финансије");
+        JLabel naslov = new JLabel(langSet.getString("AboutLabelName"));
         naslov.setFont(new Font("Times New Roman",Font.BOLD,13));
         naslov.setBounds(5 * WINDOW_WIDTH / 8 - 112, 10, 270, 20);
 
-        JLabel verzija = new JLabel("Верзија            v2.0");
+        JLabel verzija = new JLabel(langSet.getString("Version"));
         verzija.setFont(new Font("Times New Roman",Font.ITALIC,13));
         verzija.setBounds(WINDOW_WIDTH / 3 + 5,70,150,20);
 
-        JLabel datum = new JLabel("Производња           12.2022.");
+        JLabel datum = new JLabel(langSet.getString("Production"));
         datum.setFont(new Font("Times New Roman",Font.ITALIC,13));
         datum.setBounds(WINDOW_WIDTH / 3 + 5,110,180,20);
 
-        JLabel autor = new JLabel("Направио и развио \u00a9 Богдан Circled B");
+        JLabel autor = new JLabel(langSet.getString("Author"));
         autor.setFont(new Font("Times New Roman",Font.BOLD,13));
         autor.setForeground(Color.BLUE);
         autor.addMouseListener(new MouseAdapter() {
@@ -76,8 +79,11 @@ public class OAplikaciji extends JDialog {
         return right;
     }
 
-    public OAplikaciji(JFrame parent){
-        super(parent, "О Апликацији",ModalityType.APPLICATION_MODAL);
+    public OAplikaciji(KorisnickoOkruzenje parent){
+        //super(parent, "О Апликацији",ModalityType.APPLICATION_MODAL);
+        this.langSet = parent.langSet;
+        setTitle(langSet.getString("About"));
+        setModalityType(ModalityType.APPLICATION_MODAL);
         //default settings for gui
         setBounds((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2 - WINDOW_WIDTH / 2, (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT);
         setResizable(false);
